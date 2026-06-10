@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Active Cooling System -- VIPV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/iconfont/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+/* ── TEMA VARIABEL ── */
+/* ── TEMA VARIABEL INDUSTRI ELEKTRO ── */
+:root{
+  --bg:#0f1115; --panel:#16191f; --card:#1e2129; --border:#2d333b;
+  --accent:#ffb24f; --accent2:#00ff9d; --accent3:#ff6b35; --accent4:#ffd700;
+  --warn:#ff4444; --text:#e2e8f0; --muted:#8b9eb3; --grid:#21252b;
+  --overlay:rgba(0,0,0,.7);
+  --tooltip-bg:rgba(15,17,21,.95);
+  --tooltip-border:#2d333b;
+  --tooltip-title:#e2e8f0;
+  --tooltip-body:#8b9eb3;
+  --shadow:rgba(0,0,0,.6);
+}
+body.light-mode{
+  --bg:#f8fafc; --panel:#f1f5f9; --card:#ffffff; --border:#e2e8f0;
+  --accent:#d97706; --accent2:#059669; --accent3:#ea580c; --accent4:#ca8a04;
+  --warn:#dc2626; --text:#1e293b; --muted:#64748b; --grid:#cbd5e1;
+  --overlay:rgba(0,0,0,.2);
+  --tooltip-bg:rgba(255,255,255,.98);
+  --tooltip-border:#e2e8f0;
+  --tooltip-title:#1e293b;
+  --tooltip-body:#64748b;
+  --shadow:rgba(0,0,0,.08);
+}
+
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;display:flex;flex-direction:column;transition:background .3s,color .3s;font-size:15px;line-height:1.6}
+.mono{font-family:'Share Tech Mono',monospace}
+
+/* ── ANIMASI ALARM (BERKEDIP) ── */
+@keyframes alertPulse {
+  0%   { background: var(--card); box-shadow: inset 0 0 0 1px var(--border); }
+  50%  { background: rgba(255, 75, 75, 0.15); box-shadow: inset 0 0 12px 2px rgba(255, 75, 75, 0.7); }
+  100% { background: var(--card); box-shadow: inset 0 0 0 1px var(--border); }
+}
+.tx-card.alarm-blink {
+  animation: alertPulse 1.2s ease-in-out infinite !important;
+}
+
+/* ── HEADER ── */
+.header{
+  background:linear-gradient(90deg,var(--bg) 0%,var(--panel) 50%,var(--bg) 100%);
+  border-bottom:1px solid var(--border);padding:8px 18px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:relative;flex-shrink:0;
+}
+.header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent)}
+.header-left{display:flex;align-items:center;gap:12px}
+.logo-ring{width:36px;height:36px;border-radius:50%;border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0}
+.logo-ring::before{content:'';position:absolute;width:28px;height:28px;border-radius:50%;border:1px solid rgba(0,212,255,.35);animation:spin 4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.logo-ring i{font-size:16px;color:var(--accent)}
+.plant-title{font-size:14px;font-weight:700;letter-spacing:2px;color:var(--text);text-transform:uppercase}
+.plant-sub{font-size:8.5px;color:var(--muted);letter-spacing:2.5px;margin-top:2px}
+.header-center{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.header-right{display:flex;align-items:center;gap:14px}
+.time-display{font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--accent);letter-spacing:2px}
+.sys-status{display:flex;align-items:center;gap:7px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--accent2);box-shadow:0 0 7px var(--accent2);animation:blink 2s ease-in-out infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── TOOLBAR BUTTON ── */
+.toolbar-btn{
+  background:var(--card);border:1px solid var(--border);color:var(--text);
+  padding:7px 12px;border-radius:6px;font-size:10px;letter-spacing:1px;
+  text-transform:uppercase;cursor:pointer;font-family:'Exo 2',sans-serif;font-weight:600;
+  display:flex;align-items:center;gap:6px;transition:all .2s;white-space:nowrap;
+}
+.toolbar-btn:hover{border-color:var(--accent);color:var(--accent)}
+.toolbar-btn.active{background:var(--accent);color:#0a1420;border-color:var(--accent)}
+.toolbar-btn i{font-size:14px}
+
+/* ── LAYOUT ── */
+.body-wrap{display:flex;flex-direction:column;flex:1;overflow:hidden}
+.main-row{display:grid;grid-template-columns:1fr 1fr;flex:1;overflow:hidden;border-bottom:1px solid var(--border)}
+.bottom-row{display:grid;grid-template-columns:1fr 1fr;height:320px;flex-shrink:0}
+
+/* ── SECTION TITLE ── */
+.section-title{
+  font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;
+  padding:10px 14px 9px;border-bottom:1px solid var(--grid);
+  display:flex;align-items:center;gap:8px;flex-shrink:0;
+}
+.section-title::before{content:'';width:3px;height:11px;background:var(--accent);border-radius:2px;flex-shrink:0}
+
+/* ── TRANSMITTER PANEL ── */
+.transmitters-panel{border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.tx-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  grid-template-rows:1fr 1fr 1fr;
+  gap:1px;background:var(--border);flex:1;overflow:hidden;
+}
+.tx-card{background:var(--card);padding:8px 10px 10px;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;transition:background .3s;min-height:88px}
+.tx-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.tx-card.level::before{background:linear-gradient(90deg,#6ec9ff,#4a9df5)}
+.tx-card.pressure::before{background:linear-gradient(90deg,#ffde72,#ffb24f)}
+.tx-card.quality::before{background:linear-gradient(90deg,#7fe3b9,#5db075)}
+.tx-card.flow::before{background:linear-gradient(90deg,#ff9a70,#ff6a52)}
+.tx-label{font-size:10px;letter-spacing:1.4px;color:var(--muted);text-transform:uppercase;margin-bottom:3px;display:flex;align-items:center;gap:5px}
+.tx-label i{font-size:12px}
+.tx-name{font-size:12px;color:var(--text);margin-bottom:5px;font-weight:600}
+.tx-value{font-family:'Share Tech Mono',monospace;font-size:30px;line-height:1.05;margin-bottom:2px}
+.tx-unit{font-size:10px;color:var(--muted);margin-bottom:6px}
+.tx-card.level .tx-value{color:#00d4ff}
+.tx-card.pressure .tx-value{color:#ffd700}
+.tx-card.quality .tx-value{color:#00ff9d}
+.tx-card.flow .tx-value{color:#ff6b35}
+.gauge-bar{height:6px;background:rgba(128,128,128,.16);border-radius:3px;overflow:hidden;margin-top:auto}
+.gauge-fill{height:100%;border-radius:3px;transition:width 1s ease}
+.level .gauge-fill{background:linear-gradient(90deg,#6ec9ff,#4a9df5)}
+.pressure .gauge-fill{background:linear-gradient(90deg,#ffde72,#ffb24f)}
+.quality .gauge-fill{background:linear-gradient(90deg,#7fe3b9,#5db075)}
+.flow .gauge-fill{background:linear-gradient(90deg,#ff9a70,#ff6a52)}
+.tx-range{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);margin-top:2px}
+.tx-trend{position:absolute;top:8px;right:8px;font-size:12px}
+.trend-up{color:#7be2af}.trend-dn{color:#ff8a8a}.trend-st{color:var(--muted)}
+
+/* ── CHART PANEL ── */
+.charts-panel{display:flex;flex-direction:column;overflow:hidden}
+.chart-header{border-bottom:1px solid var(--border);flex-shrink:0}
+.chart-tabs{display:flex}
+.tab-btn{
+  flex:1;padding:9px 6px;font-size:9.5px;letter-spacing:1px;text-transform:uppercase;
+  background:none;border:none;color:var(--muted);cursor:pointer;
+  font-family:'Exo 2',sans-serif;border-bottom:2px solid transparent;
+  transition:all .2s;font-weight:600;
+}
+.tab-btn.active{border-bottom-width:2px}
+.tab-btn:hover:not(.active){color:var(--text)}
+.time-range-bar{
+  display:flex;align-items:center;gap:6px;padding:5px 12px;
+  border-top:1px solid var(--grid);flex-shrink:0;
+  background:var(--panel);
+}
+.time-range-bar span{font-size:9px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-right:4px}
+.range-btn{
+  background:none;border:1px solid var(--border);color:var(--muted);
+  padding:4px 10px;border-radius:4px;font-size:9px;letter-spacing:1px;
+  cursor:pointer;font-family:'Share Tech Mono',monospace;transition:all .15s;
+}
+.range-btn:hover{border-color:var(--accent);color:var(--accent)}
+.range-btn.active{background:var(--accent);color:#000;border-color:var(--accent)}
+.chart-area{flex:1;padding:8px 12px;display:flex;flex-direction:column;overflow:hidden}
+.legend-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:5px;flex-shrink:0}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:9px;color:var(--muted);font-family:'Share Tech Mono',monospace}
+.legend-swatch{width:14px;height:2px;border-radius:1px;flex-shrink:0}
+.chart-wrap{position:relative;flex:1;min-height:0}
+
+/* ── PUMPS PANEL ── */
+.pumps-panel{border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;border-top:1px solid var(--border)}
+.pump-list{padding:4px 8px;display:flex;flex-direction:column;gap:3px;overflow-y:auto;flex:1}
+.pump-card{
+  background:var(--card);border:1px solid var(--border);border-radius:4px;
+  padding:8px 10px;display:flex;align-items:flex-start;gap:8px;position:relative;overflow:hidden;
+  transition:border-color .3s;
+  min-height:76px;
+}
+.pump-card.running{border-color:rgba(46,155,102,.35)}
+.pump-card.running::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(46,155,102,.06) 0%,transparent 65%)}
+.pump-icon-wrap{width:42px;height:42px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;transition:all .3s}
+.pump-icon-wrap.running{border-color:var(--accent2);box-shadow:0 0 12px rgba(46,155,102,.18)}
+.pump-icon-wrap i{font-size:18px;color:var(--muted)}
+.pump-icon-wrap.running i{color:var(--accent2)}
+.spin-ring{position:absolute;inset:-4px;border-radius:50%;border:1px dashed rgba(46,155,102,.4);animation:spin 3s linear infinite}
+.pump-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.pump-name{font-size:12px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--text);margin:0;line-height:1.35}
+.pump-spec{font-size:11px;color:var(--muted);margin:0;line-height:1.4}
+.pump-stats{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.pump-rpm{font-family:'Share Tech Mono',monospace;font-size:16px;color:var(--accent2)}
+.pump-bar{height:5px;background:rgba(128,128,128,.14);border-radius:3px;margin-top:6px;overflow:hidden}
+.pump-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent2),#00aa66);border-radius:3px;transition:width 1s}
+.pump-status-badge{padding:5px 10px;border-radius:6px;font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:700;flex-shrink:0}
+.badge-run{background:rgba(0,255,157,.12);color:var(--accent2);border:1px solid rgba(0,255,157,.3)}
+.badge-stop{background:rgba(255,110,110,.12);color:#d15757;border:1px solid rgba(255,110,110,.2)}
+.badge-stby{background:rgba(213,176,64,.12);color:#b48b2f;border:1px solid rgba(213,176,64,.2)}
+
+/* ── VALVE PANEL ── */
+.valves-panel{display:flex;flex-direction:column;overflow:hidden;border-top:1px solid var(--border)}
+.valve-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr;
+  gap:1px;background:var(--border);
+  margin:6px 9px;border:1px solid var(--border);border-radius:5px;overflow:hidden;
+  flex:1;min-height:0;
+}
+.valve-cell{
+  background:var(--card);padding:6px 4px;text-align:center;
+  display:flex;flex-direction:column;align-items:center;justify-content:space-evenly;
+  min-height:0;overflow:hidden;
+}
+.valve-circle{
+  width:36px;height:36px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;border:2px solid var(--border);flex-shrink:0;
+}
+.valve-circle.open{border-color:var(--accent2);background:rgba(46,155,102,.14);box-shadow:0 0 8px rgba(46,155,102,.12)}
+.valve-circle.closed{border-color:rgba(255,110,110,.4);background:rgba(255,110,110,.08)}
+.valve-circle i{font-size:18px}
+.valve-circle.open i{color:var(--accent2)}
+.valve-circle.closed i{color:#ff6666}
+.valve-id{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);line-height:1.2}
+.valve-name{font-size:8.5px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);line-height:1.2}
+.valve-state{font-size:9px;letter-spacing:1.8px;font-weight:700;text-transform:uppercase;line-height:1.2}
+.valve-state.open{color:var(--accent2)}.valve-state.closed{color:#ff6e6e}
+.flow-anim{position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:18px;height:2px;background:var(--accent2);border-radius:1px;animation:fpulse 1.5s ease-in-out infinite}
+@keyframes fpulse{0%,100%{opacity:.3;width:10px}50%{opacity:1;width:18px}}
+
+/* ── STATUS BAR ── */
+.alarm-bar{background:var(--panel);border-top:1px solid var(--border);padding:5px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0;overflow:hidden}
+.alarm-label{font-size:8px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;flex-shrink:0;display:flex;align-items:center;gap:5px}
+.alarm-label i{color:var(--accent4);font-size:11px}
+.ticker-wrap{overflow:hidden;flex:1;position:relative}
+.ticker-track {
+  display: flex;
+  gap: 40px; /* Jarak antar teks */
+  white-space: nowrap;
+  animation: ticker 30s linear infinite;
+  will-change: transform; /* Optimasi performa */
+}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.ticker-item{font-size:8.5px;color:var(--muted);letter-spacing:1px;flex-shrink:0;display:flex;align-items:center;gap:5px}
+.ticker-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.t-ok .ticker-dot{background:var(--accent2);box-shadow:0 0 4px var(--accent2)}
+.t-warn .ticker-dot{background:var(--accent4);box-shadow:0 0 4px var(--accent4)}
+.t-info .ticker-dot{background:var(--accent);box-shadow:0 0 4px var(--accent)}
+.t-err .ticker-dot{background:#ff4444;box-shadow:0 0 4px #ff4444}
+
+/* ── MODAL OVERLAY ── */
+.modal-overlay{
+  position:fixed;inset:0;background:var(--overlay);z-index:100;
+  display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px);
+}
+.modal-overlay.open{display:flex}
+.modal-box{
+  background:var(--panel);border:1px solid var(--border);border-radius:4px;
+  padding:22px 26px;width:420px;max-width:90vw;box-shadow:0 20px 60px var(--shadow);
+}
+.modal-title{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.modal-title i{font-size:18px}
+.modal-body{display:flex;flex-direction:column;gap:14px}
+.modal-row{display:flex;flex-direction:column;gap:6px}
+.modal-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.modal-select,.modal-input{
+  background:var(--card);border:1px solid var(--border);color:var(--text);
+  padding:9px 12px;border-radius:6px;font-size:11px;font-family:'Exo 2',sans-serif;
+  width:100%;outline:none;transition:border-color .2s;
+}
+.modal-select:focus,.modal-input:focus{border-color:var(--accent)}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
+.modal-btn{
+  padding:7px 16px;border-radius:5px;font-size:9px;letter-spacing:1.5px;
+  text-transform:uppercase;cursor:pointer;font-family:'Exo 2',sans-serif;font-weight:700;border:1px solid var(--border);
+  background:var(--card);color:var(--muted);transition:all .2s;
+}
+.modal-btn.primary{background:var(--accent);color:#000;border-color:var(--accent)}
+.modal-btn:hover{opacity:.85}
+.tx-card:hover{box-shadow:inset 0 0 0 1px var(--border)}
+
+/* ── TABLE LOG ALARM ── */
+.log-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 11px; color: var(--text); }
+.log-table th { padding: 8px 6px; border-bottom: 1px solid var(--border); color: var(--muted); letter-spacing: 1px; }
+.log-table td { padding: 8px 6px; border-bottom: 1px solid var(--grid); }
+
+/* scrollbar */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* ── RESPONSIVE / MOBILE & LAYOUT FIXES ── */
+.chart-area, .charts-panel { min-height: 0; } /* Mencegah grafik pecah saat Fullscreen */
+
+@media (max-width: 768px) {
+  html, body { height: auto; overflow: visible; display: block; }
+  .body-wrap { display: flex; flex-direction: column; overflow: visible; height: auto; }
+  .header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 12px; }
+  .header-center { width: 100%; justify-content: flex-start; flex-wrap: wrap; margin-top: 5px; }
+  .header-right { width: 100%; display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid var(--border); padding-top: 12px; margin-top: 5px; }
+  .header-right > div:nth-child(2) { display: none; }
+  .main-row { display: flex; flex-direction: column; height: auto; border-bottom: none; }
+  
+  /* Memaksa susunan kolom menjadi baris pada layar ponsel */
+  .bottom-row { display: flex !important; flex-direction: column !important; height: auto !important; }
+  .bottom-row > div { display: flex !important; flex-direction: column !important; border-right: none !important; width: 100% !important; }
+  
+  .transmitters-panel, .pumps-panel, .valves-panel, .energy-panel { 
+    border-right: none !important; 
+    border-bottom: 1px solid var(--border); 
+    width: 100% !important; 
+    min-height: auto !important;
+  }
+  .valve-grid { grid-template-columns: repeat(2, 1fr) !important; height: auto !important; }
+  
+  /* Menjaga proporsi kanvas grafik di layar kecil */
+  .charts-panel { display: flex !important; flex-direction: column !important; height: auto !important; }
+  .chart-area { min-height: 300px !important; flex: none !important; }
+  .energy-panel { min-height: 250px !important; flex: none !important; }
+  .chart-wrap { position: relative !important; width: 100% !important; height: 100% !important; }
+  
+  .alarm-bar { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--border); }
+  .ticker-wrap { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo-ring"><i class="ti ti-droplet"></i></div>
+<div>
+      <div class="plant-title">Sistem Pendingin PV</div>
+      <div class="plant-sub">Vehicle-Integrated Photovoltaics (VIPV) &nbsp;·&nbsp; Monitoring System v1.0</div>
+    </div>
+  </div>
+
+<div class="header-center" style="gap:6px">
+    <button class="toolbar-btn" onclick="toggleTheme()" id="themeBtn" title="Ganti tema">
+      <i class="ti ti-sun" id="themeIcon"></i> <span id="themeLabel">Light</span>
+    </button>
+    <button class="toolbar-btn" onclick="openExportModal()" title="Ekspor Data CSV">
+      <i class="ti ti-download"></i> Ekspor Data
+    </button>
+    <button class="toolbar-btn" onclick="toggleFullscreen()" id="fsBtn" title="Fullscreen">
+      <i class="ti ti-maximize" id="fsIcon"></i>
+    </button>
+  </div>
+
+  <div class="header-right">
+    <div style="text-align:right">
+      <div style="font-size:8.5px;letter-spacing:2px;color:var(--muted)" id="datedisp">—</div>
+      <div class="time-display" id="clock">00:00:00</div>
+    </div>
+    <div style="width:1px;height:26px;background:var(--border)"></div>
+    <div style="text-align:right">
+      <div class="sys-status" style="justify-content:flex-end;margin-bottom:3px">
+        <div class="dot" id="connDot"></div>
+        <span style="font-size:9px;letter-spacing:1.5px;color:var(--text)" id="statusText">MENGHUBUNGKAN...</span>
+      </div>
+      <div style="font-size:7.5px;color:var(--muted);letter-spacing:1px" id="updateInterval">Connecting to server...</div>
+    </div>
+  </div>
+</div>
+
+<div class="body-wrap">
+  <div class="main-row">
+    <div class="transmitters-panel">
+      <div class="section-title"><i class="ti ti-antenna"></i> Transmitter &amp; Sensor — 6 Unit</div>
+      <div class="tx-grid"> 
+        <div class="tx-card" id="txcard-t1">
+          <div class="tx-trend" id="t1trend"><span class="trend-st"><i class="ti ti-minus"></i></span></div>
+          <div class="tx-label"><i class="ti ti-thermometer"></i> Suhu Permukaan</div>
+          <div class="tx-name">T-01 · Suhu Zona 1</div>
+          <div class="tx-value" id="t1val" style="color:#ffb24f">—</div>
+          <div class="tx-unit">°C</div>
+          <div class="gauge-bar"><div class="gauge-fill" id="t1bar" style="width:0%; background:linear-gradient(90deg,#ffde72,#ff6a52)"></div></div>
+          <div class="tx-range"><span>0.0 °C</span><span>100.0 °C</span></div>
+        </div>
+        <div class="tx-card" id="txcard-t2">
+          <div class="tx-trend" id="t2trend"><span class="trend-st"><i class="ti ti-minus"></i></span></div>
+          <div class="tx-label"><i class="ti ti-thermometer"></i> Suhu Permukaan</div>
+          <div class="tx-name">T-02 · Suhu Zona 2</div>
+          <div class="tx-value" id="t2val" style="color:#ffb24f">—</div>
+          <div class="tx-unit">°C</div>
+          <div class="gauge-bar"><div class="gauge-fill" id="t2bar" style="width:0%; background:linear-gradient(90deg,#ffde72,#ff6a52)"></div></div>
+          <div class="tx-range"><span>0.0 °C</span><span>100.0 °C</span></div>
+        </div>
+        <div class="tx-card" id="txcard-t3">
+          <div class="tx-trend" id="t3trend"><span class="trend-st"><i class="ti ti-minus"></i></span></div>
+          <div class="tx-label"><i class="ti ti-thermometer"></i> Suhu Permukaan</div>
+          <div class="tx-name">T-03 · Suhu Zona 3</div>
+          <div class="tx-value" id="t3val" style="color:#ffb24f">—</div>
+          <div class="tx-unit">°C</div>
+          <div class="gauge-bar"><div class="gauge-fill" id="t3bar" style="width:0%; background:linear-gradient(90deg,#ffde72,#ff6a52)"></div></div>
+          <div class="tx-range"><span>0.0 °C</span><span>100.0 °C</span></div>
+        </div>
+        <div class="tx-card" id="txcard-t4">
+          <div class="tx-trend" id="t4trend"><span class="trend-st"><i class="ti ti-minus"></i></span></div>
+          <div class="tx-label"><i class="ti ti-thermometer"></i> Suhu Permukaan</div>
+          <div class="tx-name">T-04 · Suhu Zona 4</div>
+          <div class="tx-value" id="t4val" style="color:#ffb24f">—</div>
+          <div class="tx-unit">°C</div>
+          <div class="gauge-bar"><div class="gauge-fill" id="t4bar" style="width:0%; background:linear-gradient(90deg,#ffde72,#ff6a52)"></div></div>
+          <div class="tx-range"><span>0.0 °C</span><span>100.0 °C</span></div>
+        </div>
+        <div class="tx-card" id="txcard-t5">
+          <div class="tx-trend" id="t5trend"><span class="trend-st"><i class="ti ti-minus"></i></span></div>
+          <div class="tx-label"><i class="ti ti-thermometer"></i> Suhu Permukaan</div>
+          <div class="tx-name">T-05 · Suhu Zona 5</div>
+          <div class="tx-value" id="t5val" style="color:#ffb24f">—</div>
+          <div class="tx-unit">°C</div>
+          <div class="gauge-bar"><div class="gauge-fill" id="t5bar" style="width:0%; background:linear-gradient(90deg,#ffde72,#ff6a52)"></div></div>
+          <div class="tx-range"><span>0.0 °C</span><span>100.0 °C</span></div>
+        </div>
+        <div class="tx-card" id="txcard-t6">
+          <div class="tx-trend" id="t6trend"><span class="trend-st"><i class="ti ti-minus"></i></span></div>
+          <div class="tx-label"><i class="ti ti-thermometer"></i> Suhu Permukaan</div>
+          <div class="tx-name">T-06 · Suhu Zona 6</div>
+          <div class="tx-value" id="t6val" style="color:#ffb24f">—</div>
+          <div class="tx-unit">°C</div>
+          <div class="gauge-bar"><div class="gauge-fill" id="t6bar" style="width:0%; background:linear-gradient(90deg,#ffde72,#ff6a52)"></div></div>
+          <div class="tx-range"><span>0.0 °C</span><span>100.0 °C</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="charts-panel" style="display:flex; flex-direction:column; border-right: none;">
+      <div class="section-title" style="padding-bottom:0;border-bottom:none"><i class="ti ti-chart-line"></i> Grafik Realtime</div>
+      <div class="chart-header">
+        <div class="chart-tabs">
+          <button class="tab-btn active" onclick="switchTab(0)" style="color:#ffb24f;border-bottom-color:#ffb24f">Suhu Panel</button>
+          <button class="tab-btn" onclick="switchTab(1)">Lingkungan</button>
+          <button class="tab-btn" onclick="switchTab(2)">Tegangan (V)</button>
+          <button class="tab-btn" onclick="switchTab(3)">Arus (A)</button>
+          <button class="tab-btn" onclick="switchTab(4)">Daya (W)</button>
+          <button class="tab-btn" onclick="switchTab(5)">Aktuator PID</button>
+        </div>
+        <div class="time-range-bar">
+          <span>Rentang Pengujian:</span>
+          <button class="range-btn active" onclick="setRange(900)">15 Menit</button>
+          <button class="range-btn" onclick="setRange(3600)">1 Jam</button>
+          <button class="range-btn" onclick="setRange(14400)">4 Jam</button>
+          <button class="range-btn" onclick="setRange(28800)">8 Jam</button>
+        </div>
+      </div>
+      <div class="chart-area" style="flex:1; display:flex; flex-direction:column; min-height:0; min-width:0; overflow:hidden;">
+        <div class="legend-row" id="legendRow"></div>
+        <div class="chart-wrap" style="flex:1; position:relative; min-height:0; min-width:0; overflow:hidden;">
+          <canvas id="rtChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div> <div class="bottom-row">
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; border-right: 1px solid var(--border);">
+      
+      <div class="pumps-panel" style="border-right: 1px solid var(--border); border-top: none; display: flex; flex-direction: column;">
+        <div class="section-title"><i class="ti ti-engine"></i> Aktuator & Kendali Pompa</div>
+        <div class="pump-list" style="flex: 1; overflow-y: auto; padding: 10px;">
+          
+          <div class="pump-card" id="pcard-pm1" style="margin-bottom: 12px; min-height: 80px;">
+            <div class="pump-icon-wrap" id="picon-pm1">
+              <div class="spin-ring"></div>
+              <i class="ti ti-droplet-half-2"></i>
+            </div>
+            <div class="pump-info">
+              <div class="pump-name">PM-01 · Pompa Pendingin</div>
+              <div class="pump-spec">Diaphragm Pump 12V DC</div>
+              <div class="pump-stats">
+                <span class="pump-rpm"><span id="pm1pwm">—</span> <span style="font-size:7.5px;color:var(--muted)">PWM</span></span>
+                <span style="font-size:8.5px;color:var(--muted)">Duty Cycle:</span>
+                <span style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--accent2)" id="pm1load">—</span><span style="font-size:7.5px;color:var(--muted)">%</span>
+              </div>
+              <div class="pump-bar"><div class="pump-bar-fill" id="pm1bar" style="width:0%"></div></div>
+            </div>
+          </div>
+          
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 4px; padding: 12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+              <span style="font-size:11px; color:var(--text); text-transform:uppercase; font-weight: 600;"><i class="ti ti-settings"></i> Mode Operasi</span>
+              <select id="ctrlMode" onchange="toggleControlMode()" style="background:var(--panel); border:1px solid var(--border); color:var(--accent); padding:4px 8px; border-radius:4px; font-size:11px; outline:none; font-family:'Exo 2', sans-serif; cursor:pointer;">
+                <option value="AUTO">Otomatis (PID)</option>
+                <option value="MANUAL">Manual (Override)</option>
+              </select>
+            </div>
+            
+            <div id="manualControls" style="opacity: 0.4; transition: opacity 0.3s;">
+              <div style="display:flex; justify-content:space-between; margin-bottom: 8px;">
+                <span style="font-size:10px; color:var(--muted); text-transform:uppercase;">Target PWM (<span id="pwmValDisp" class="mono" style="color:var(--text);">0</span>)</span>
+                <span id="pwmPctDisp" class="mono" style="font-size:14px; color:var(--accent2); font-weight:bold;">0%</span>
+              </div>
+              <input type="range" id="pwmSlider" min="0" max="255" value="0" disabled style="width:100%; cursor:pointer;" oninput="updateSliderDisp(this.value)" onchange="sendManualPWM(this.value)">
+              <div style="font-size:8.5px; color:var(--muted); margin-top:6px; text-align:right;">*Geser untuk memodulasi kecepatan motor DC</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="valves-panel" style="border-top: none; display:flex; flex-direction:column; background: transparent;">
+        <div class="section-title"><i class="ti ti-bolt"></i> Kelistrikan & Lingkungan</div>
+        <div class="valve-grid" style="grid-template-columns: repeat(2, 1fr); gap: 6px; padding: 10px; border:none; margin:0; background: transparent; overflow-y:auto;">
+          
+          <div class="valve-cell" style="padding:8px; border:1px solid var(--border); border-radius: 4px;">
+            <div class="valve-id" style="font-size:10px; color:var(--accent); text-align: left; width: 100%;">TA-01</div>
+            <div class="mono" id="ta1val" style="font-size:18px; font-weight:bold; color:#00d4ff; margin: 4px 0;">—</div>
+            <div style="font-size:8px; color:var(--muted);">Suhu Ambien (°C)</div>
+          </div>
+          <div class="valve-cell" style="padding:8px; border:1px solid var(--border); border-radius: 4px;">
+            <div class="valve-id" style="font-size:10px; color:var(--accent); text-align: left; width: 100%;">V-01</div>
+            <div class="mono" id="v1val" style="font-size:18px; font-weight:bold; color:#ffd700; margin: 4px 0;">—</div>
+            <div style="font-size:8px; color:var(--muted);">Tegangan Panel (V)</div>
+          </div>
+          <div class="valve-cell" style="padding:8px; border:1px solid var(--border); border-radius: 4px;">
+            <div class="valve-id" style="font-size:10px; color:var(--accent); text-align: left; width: 100%;">I-01</div>
+            <div class="mono" id="i1val" style="font-size:18px; font-weight:bold; color:#ff6b35; margin: 4px 0;">—</div>
+            <div style="font-size:8px; color:var(--muted);">Arus Panel (A)</div>
+          </div>
+          <div class="valve-cell" style="padding:8px; border:1px solid var(--border); border-radius: 4px;">
+            <div class="valve-id" style="font-size:10px; color:var(--warn); text-align: left; width: 100%;">P-01</div>
+            <div class="mono" id="p1val" style="font-size:18px; font-weight:bold; color:#ff4444; margin: 4px 0;">—</div>
+            <div style="font-size:8px; color:var(--muted);">Daya Bersih (W)</div>
+          </div>
+          <div class="valve-cell" style="padding:8px; border:1px solid rgba(0,212,255,0.4); border-radius: 4px; background: rgba(0,212,255,0.05);">
+            <div class="valve-id" style="font-size:10px; color:#00d4ff; text-align: left; width: 100%;">T-AVG</div>
+            <div class="mono" id="tavg-val" style="font-size:18px; font-weight:bold; color:#00d4ff; margin: 4px 0;">—</div>
+            <div style="font-size:8px; color:var(--muted);">Rata-rata Suhu (°C)</div>
+          </div>
+          <div class="valve-cell" style="padding:8px; border:1px solid var(--border); border-radius: 4px;">
+            <div class="valve-id" style="font-size:10px; color:#00ff9d; text-align: left; width: 100%;">RH-01</div>
+            <div class="mono" id="rh1val" style="font-size:18px; font-weight:bold; color:#00ff9d; margin: 4px 0;">—</div>
+            <div style="font-size:8px; color:var(--muted);">Kelembapan Udara (%)</div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+
+    <div class="energy-panel" style="display: flex; flex-direction: column; padding: 15px; background: var(--panel); min-height:0; min-width:0; overflow:hidden;">
+      <div class="section-title" style="border-bottom: 1px solid var(--border); padding: 0 0 10px 0; display: flex; justify-content: space-between; align-items: center;">
+        <span><i class="ti ti-bolt"></i> Grafik Energi Terakumulasi Harian</span>
+        <div class="mono" style="font-size: 18px; font-weight: bold; color: #ffd700; background: var(--card); padding: 2px 10px; border-radius: 4px; border: 1px solid var(--border);">
+          <span id="energy-val">0.000</span> <span style="font-size: 10px; color: var(--muted);">Wh</span>
+        </div>
+      </div>
+      <div style="position: relative; flex: 1; width: 100%; margin-top: 15px; min-height:0; min-width:0; overflow:hidden;">
+        <canvas id="energyChart"></canvas>
+      </div>
+    </div>
+
+  </div>
+
+  
+  </div><div class="alarm-bar">
+    <div class="alarm-label"><i class="ti ti-activity"></i> Status Sistem</div>
+    <div class="ticker-wrap">
+      <div class="ticker-track" id="tickerTrack"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="exportModal">
+  <div class="modal-box">
+    <div class="modal-title"><i class="ti ti-download"></i> Export Data Sensor</div>
+    <div class="modal-body">
+      <div class="modal-row">
+        <div class="modal-label">Sensor</div>
+        <select class="modal-select" id="expSensor">
+          <option value="ALL">Semua Parameter (Gabungan)</option>
+          <option value="T-01">T-01 · Suhu Panel 1</option>
+          <option value="T-02">T-02 · Suhu Panel 2</option>
+          <option value="T-03">T-03 · Suhu Panel 3</option>
+          <option value="T-04">T-04 · Suhu Panel 4</option>
+          <option value="T-05">T-05 · Suhu Panel 5</option>
+          <option value="T-06">T-06 · Suhu Panel 6</option>
+          <option value="TA-01">TA-01 · Suhu Ambien</option>
+          <option value="V-01">V-01 · Tegangan Panel</option>
+          <option value="I-01">I-01 · Arus Panel</option>
+          <option value="P-01">P-01 · Daya Listrik (Power)</option>
+          <option value="PM-01">PM-01 · Aktuator Modulasi PWM</option>
+        </select>
+
+        <label style="margin-top:10px;display:block;font-size:12px;color:var(--muted)">Rentang Waktu Rekaman:</label>
+        <select class="modal-select" id="expMinutes">
+          <option value="15">15 Menit Terakhir</option>
+          <option value="60">1 Jam Terakhir</option>
+          <option value="360">6 Jam Terakhir</option>
+          <option value="480">8 Jam Terakhir</option>
+          <option value="720">12 Jam Terakhir</option>
+          <option value="1440">24 Jam Terakhir</option>
+        </select>
+      </div>
+      <div class="modal-row">
+        <div class="modal-label">Format</div>
+        <select class="modal-select" id="expFormat">
+          <option value="csv">CSV</option>
+          <option value="json">JSON</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="closeModal('exportModal')">Batal</button>
+      <button class="modal-btn primary" onclick="doExport()"><i class="ti ti-download"></i> Download</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="alarmModal">
+  <div class="modal-box">
+    <div class="modal-title"><i class="ti ti-bell"></i> Pengaturan Batas Alarm</div>
+    <div class="modal-body">
+      <div style="font-size:8.5px;color:var(--muted);letter-spacing:1px;margin-bottom:4px">Batas ini akan disinkronisasi ke server dan memicu log database.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:center">
+        <div style="font-size:8px;color:var(--muted);letter-spacing:1px">SENSOR</div>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:1px">MIN</div>
+        <div style="font-size:8px;color:var(--muted);letter-spacing:1px">MAX</div>
+
+        <div class="modal-label">LT-101 (m)</div>
+        <input class="modal-input" id="alm_lt1_min" type="number" step="0.1" placeholder="0.2">
+        <input class="modal-input" id="alm_lt1_max" type="number" step="0.1" placeholder="3.8">
+
+        <div class="modal-label">PT-201 (bar)</div>
+        <input class="modal-input" id="alm_pt1_min" type="number" step="0.1" placeholder="0.5">
+        <input class="modal-input" id="alm_pt1_max" type="number" step="0.1" placeholder="4.5">
+
+        <div class="modal-label">QT-301 (ppm)</div>
+        <input class="modal-input" id="alm_qt1_min" type="number" step="1" placeholder="0">
+        <input class="modal-input" id="alm_qt1_max" type="number" step="1" placeholder="300">
+
+        <div class="modal-label">FT-401 (m³/h)</div>
+        <input class="modal-input" id="alm_ft1_min" type="number" step="1" placeholder="10">
+        <input class="modal-input" id="alm_ft1_max" type="number" step="1" placeholder="70">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="closeModal('alarmModal')">Batal</button>
+      <button class="modal-btn primary" onclick="saveAlarms()">Simpan & Sync</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="logModal">
+  <div class="modal-box" style="width:580px; max-width:95vw;">
+    <div class="modal-title"><i class="ti ti-list"></i> Riwayat Alarm Terakhir</div>
+    <div class="modal-body" style="max-height: 300px; overflow-y: auto;">
+      <table class="log-table">
+        <thead>
+          <tr>
+            <th>WAKTU</th>
+            <th>SENSOR</th>
+            <th>TIPE ALARM</th>
+            <th>NILAI TERCATAT</th>
+            <th>BATAS</th>
+          </tr>
+        </thead>
+        <tbody id="logTableBody">
+          <tr><td colspan="5" style="text-align:center; padding: 10px;">Memuat data database...</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="closeModal('logModal')">Tutup</button>
+      <button class="modal-btn primary" onclick="fetchAlarmLogs()"><i class="ti ti-refresh"></i> Muat Ulang</button>
+    </div>
+  </div>
+</div>
+
+<div id="exportModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 style="color: var(--text); font-family: 'Exo 2', sans-serif;"><i class="ti ti-download"></i> Ekspor Data Pengujian</h3>
+        <button class="close-btn" onclick="closeModal('exportModal')" style="background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px;"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="modal-body" style="display: flex; flex-direction: column; gap: 15px; margin-top: 15px;">
+        
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <label style="font-size: 11px; color: var(--muted);">Parameter Ekstraksi:</label>
+          <select class="modal-select" id="expSensor" style="padding: 8px; background: var(--panel); border: 1px solid var(--border); color: var(--text); border-radius: 4px; outline: none;">
+            <option value="ALL">Semua Parameter (Tabel Gabungan)</option>
+            <option value="T-01">T-01 · Suhu Panel 1</option>
+            <option value="T-02">T-02 · Suhu Panel 2</option>
+            <option value="T-03">T-03 · Suhu Panel 3</option>
+            <option value="T-04">T-04 · Suhu Panel 4</option>
+            <option value="T-05">T-05 · Suhu Panel 5</option>
+            <option value="T-06">T-06 · Suhu Panel 6</option>
+            <option value="TA-01">TA-01 · Suhu Ambien</option>
+            <option value="RH-01">RH-01 · Kelembapan Udara</option>
+            <option value="V-01">V-01 · Tegangan Panel</option>
+            <option value="I-01">I-01 · Arus Panel</option>
+            <option value="P-01">P-01 · Daya Listrik</option>
+            <option value="PM-01">PM-01 · Sinyal PWM Pompa</option>
+          </select>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <label style="font-size: 11px; color: var(--muted);">Rentang Waktu Rekaman:</label>
+          <select class="modal-select" id="expMinutes" style="padding: 8px; background: var(--panel); border: 1px solid var(--border); color: var(--text); border-radius: 4px; outline: none;">
+            <option value="15">15 Menit Terakhir</option>
+            <option value="60">1 Jam Terakhir</option>
+            <option value="360">6 Jam Terakhir</option>
+            <option value="480">8 Jam Terakhir</option>
+            <option value="720">12 Jam Terakhir</option>
+            <option value="1440">24 Jam Terakhir</option>
+            <option value="999999">Seluruh Data Tersimpan</option>
+          </select>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <label style="font-size: 11px; color: var(--muted);">Format Keluaran:</label>
+          <select class="modal-select" id="expFormat" style="padding: 8px; background: var(--panel); border: 1px solid var(--border); color: var(--text); border-radius: 4px; outline: none;">
+            <option value="csv">CSV (Kompatibel dengan Excel)</option>
+            <option value="json">JSON (Data Mentah Program)</option>
+          </select>
+        </div>
+
+        <button class="export-btn" onclick="doExport()" style="margin-top: 10px; padding: 10px; background: var(--accent2); color: #000; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Unduh Berkas</button>
+      </div>
+    </div>
+  </div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+
+
+<script>
+/* ── UI & MODAL ── */
+function updateClock(){
+  const d=new Date(),pad=n=>String(n).padStart(2,'0');
+  document.getElementById('clock').textContent=pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
+  const days=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+  const months=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  document.getElementById('datedisp').textContent=days[d.getDay()]+', '+d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear();
+}
+updateClock(); setInterval(updateClock,1000);
+
+let isLight = false;
+function toggleTheme(){
+  isLight = !isLight;
+  document.body.classList.toggle('light-mode', isLight);
+  document.getElementById('themeIcon').className = isLight ? 'ti ti-moon' : 'ti ti-sun';
+  document.getElementById('themeLabel').textContent = isLight ? 'Dark' : 'Light';
+  const styles = getComputedStyle(document.body);
+  const gridColor = isLight ? 'rgba(100,140,180,.2)' : 'rgba(26,58,92,.35)';
+  const tickColor = styles.getPropertyValue('--muted').trim() || (isLight ? '#6688aa' : '#4a6fa5');
+  chart.options.scales.x.grid.color = gridColor;
+  chart.options.scales.y.grid.color = gridColor;
+  chart.options.scales.x.ticks.color = tickColor;
+  chart.options.scales.y.ticks.color = tickColor;
+  chart.options.plugins.tooltip.backgroundColor = styles.getPropertyValue('--tooltip-bg').trim();
+  chart.options.plugins.tooltip.titleColor = styles.getPropertyValue('--tooltip-title').trim();
+  chart.options.plugins.tooltip.bodyColor  = styles.getPropertyValue('--tooltip-body').trim();
+  chart.options.plugins.tooltip.borderColor = styles.getPropertyValue('--tooltip-border').trim();
+  Chart.defaults.color = tickColor;
+  chart.update('none');
+  energyChart.options.scales.x.grid.color = gridColor;
+  energyChart.options.scales.y.grid.color = gridColor;
+  energyChart.options.scales.x.ticks.color = tickColor;
+  energyChart.options.scales.y.ticks.color = tickColor;
+  energyChart.update('none');
+}
+
+function toggleFullscreen(){
+  if(!document.fullscreenElement){ document.documentElement.requestFullscreen(); document.getElementById('fsIcon').className='ti ti-minimize'; } 
+  else { document.exitFullscreen(); document.getElementById('fsIcon').className='ti ti-maximize'; }
+}
+
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open'); }));
+function openExportModal(){ document.getElementById('exportModal').classList.add('open'); }
+
+
+/* ── DATA EKSPOR ── */
+/* ── FUNGSI EKSTRAKSI DATA MENTAH ── */
+async function doExport(){
+  const sensor = document.getElementById('expSensor').value;
+  const minutes = document.getElementById('expMinutes').value;
+  const format = document.getElementById('expFormat').value;
+  
+  try {
+    let csvData = '';
+    let exportFileName = '';
+
+    if (sensor === 'ALL') {
+      const sensorList = ['T-01','T-02','T-03','T-04','T-05','T-06','TA-01','RH-01','V-01','I-01','P-01','PM-01'];
+      const combinedData = {};
+      const timestampSet = new Set();
+
+      // Menarik data paralel dari database
+      const fetchPromises = sensorList.map(s => fetch(`${API_BASE}/api/history/${s}?minutes=${minutes}`).then(r => r.json()));
+      const results = await Promise.all(fetchPromises);
+
+      results.forEach((json, index) => {
+        const currentSensor = sensorList[index];
+        if (json.data) {
+          json.data.forEach(record => {
+            const ts = record.recorded_at || record.updated_at;
+            if(!combinedData[ts]) combinedData[ts] = {};
+            combinedData[ts][currentSensor] = record.value;
+            timestampSet.add(ts);
+          });
+        }
+      });
+
+      const sortedTimestamps = Array.from(timestampSet).sort();
+      if (sortedTimestamps.length === 0) { alert('Tidak ada data pada rentang waktu tersebut.'); return; }
+
+      if (format === 'csv') {
+        const header = ['Timestamp', ...sensorList].join(',');
+        const rows = sortedTimestamps.map(ts => {
+          const rowValues = [ts];
+          sensorList.forEach(s => {
+            rowValues.push(combinedData[ts][s] !== undefined ? combinedData[ts][s] : '');
+          });
+          return rowValues.join(',');
+        });
+        csvData = header + '\n' + rows.join('\n');
+        exportFileName = `Data_Terpadu_${minutes}mnt.csv`;
+      } else {
+        const jsonObj = sortedTimestamps.map(ts => ({ timestamp: ts, ...combinedData[ts] }));
+        csvData = JSON.stringify(jsonObj, null, 2);
+        exportFileName = `Data_Terpadu_${minutes}mnt.json`;
+      }
+
+    } else {
+      const res = await fetch(`${API_BASE}/api/history/${sensor}?minutes=${minutes}`);
+      const json = await res.json();
+      const rows = json.data || [];
+      if(rows.length === 0){ alert('Tidak ada data pada rentang waktu tersebut.'); return; }
+
+      if(format === 'csv'){
+        csvData = 'timestamp,value\n' + rows.map(r => `${r.recorded_at || r.updated_at},${r.value}`).join('\n');
+        exportFileName = `${sensor}_${minutes}mnt.csv`;
+      } else {
+        csvData = JSON.stringify(rows, null, 2);
+        exportFileName = `${sensor}_${minutes}mnt.json`;
+      }
+    }
+
+    const fileType = format === 'csv' ? 'text/csv' : 'application/json';
+    const blobObject = new Blob([csvData], {type: fileType});
+    const anchorElement = document.createElement('a');
+    anchorElement.href = URL.createObjectURL(blobObject);
+    anchorElement.download = exportFileName;
+    anchorElement.click();
+    closeModal('exportModal');
+
+  } catch(error){ 
+    alert('Sistem gagal mengambil data. Pastikan server aktif. Kesalahan: ' + error.message); 
+  }
+}
+
+/* ── KONFIGURASI GRAFIK ── */
+const tsLabels = [];
+const allDS = [
+  [ {label:'T-01 (°C)', data:[], borderColor:'#ff6a52', borderWidth:1.5, pointRadius:0, tension:0.4, fill:false}, {label:'T-02 (°C)', data:[], borderColor:'#ff8c00', borderWidth:1.5, pointRadius:0, tension:0.4, fill:false}, {label:'T-03 (°C)', data:[], borderColor:'#ffd700', borderWidth:1.5, pointRadius:0, tension:0.4, fill:false}, {label:'T-04 (°C)', data:[], borderColor:'#a3ff00', borderWidth:1.5, pointRadius:0, tension:0.4, fill:false}, {label:'T-05 (°C)', data:[], borderColor:'#00ff9d', borderWidth:1.5, pointRadius:0, tension:0.4, fill:false}, {label:'T-06 (°C)', data:[], borderColor:'#00d4ff', borderWidth:1.5, pointRadius:0, tension:0.4, fill:false} ],
+  [ {label:'Suhu Ambien (°C)', data:[], borderColor:'#00d4ff', borderWidth:1.5, pointRadius:0, tension:0.4, fill:true, backgroundColor:'rgba(0,212,255,0.06)'}, {label:'Kelembapan (%)', data:[], borderColor:'#00ff9d', borderWidth:1.5, pointRadius:0, tension:0.4, fill:true, backgroundColor:'rgba(0,255,157,0.06)'} ],
+  [ {label:'Tegangan (V)', data:[], borderColor:'#ffd700', borderWidth:2, pointRadius:0, tension:0.4, fill:true, backgroundColor:'rgba(255,215,0,0.06)'} ],
+  [ {label:'Arus (A)', data:[], borderColor:'#ff6b35', borderWidth:2, pointRadius:0, tension:0.4, fill:true, backgroundColor:'rgba(255,107,53,0.06)'} ],
+  [ {label:'Daya (W)', data:[], borderColor:'#ff4444', borderWidth:2, pointRadius:0, tension:0.4, fill:true, backgroundColor:'rgba(255,68,68,0.06)'} ],
+  [ {label:'Sinyal PWM (0-255)', data:[], borderColor:'#4488ff', borderWidth:2, pointRadius:0, tension:0.4, fill:true, backgroundColor:'rgba(68,136,255,0.1)'} ]
+];
+const tabColors = ['#ffb24f','#00ff9d','#ffd700','#ff6b35','#ff4444','#4488ff'];
+
+let activeTab = 0;
+let CURRENT_RANGE_PTS = 900;
+window.totalWattSeconds = 0;
+window.globalWattHour = 0;
+
+Chart.defaults.color = 'var(--muted)';
+Chart.defaults.font.family = "'Share Tech Mono',monospace";
+Chart.defaults.font.size = 10;
+
+const ctx = document.getElementById('rtChart').getContext('2d');
+const chart = new Chart(ctx, {
+  type: 'line', data: { labels: tsLabels, datasets: allDS[0] },
+  options: {
+    responsive: true, maintainAspectRatio: false, animation: { duration: 0 },
+    plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(6,13,26,.96)', borderColor: '#1a3a5c', borderWidth: 1, titleColor: '#c8e0f4', bodyColor: '#7aabdc', padding: 10, titleFont: { size: 9 }, bodyFont: { size: 8 }, callbacks: { label: c => ` ${c.dataset.label}: ${c.formattedValue}` } } },
+    scales: { x: { grid: { color: 'rgba(26,58,92,.35)', lineWidth: .5 }, ticks: { color: '#4a6fa5', maxTicksLimit: 8, maxRotation: 0 } }, y: { grid: { color: 'rgba(26,58,92,.35)', lineWidth: .5 }, ticks: { color: '#4a6fa5' }, position: 'right' } }
+  }
+});
+
+const ctxEnergy = document.getElementById('energyChart').getContext('2d');
+const energyChart = new Chart(ctxEnergy, {
+  type: 'line', data: { labels: [], datasets: [{ label: 'Energi (Wh)', data: [], borderColor: '#ffd700', backgroundColor: 'rgba(255,215,0,0.1)', fill: true, tension: 0.4, borderWidth: 2, pointRadius: 0 }] },
+  options: { responsive: true, maintainAspectRatio: false, animation: { duration: 0 }, plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(26,58,92,.35)', lineWidth: .5 }, ticks: { color: '#4a6fa5', maxTicksLimit: 8, maxRotation: 0 } }, y: { grid: { color: 'rgba(26,58,92,.35)', lineWidth: .5 }, ticks: { color: '#4a6fa5' }, position: 'right' } } }
+});
+
+function updateChartView(){
+  let pts = CURRENT_RANGE_PTS;
+  chart.data.labels = tsLabels.slice(-pts);
+  chart.data.datasets = allDS[activeTab].map(ds => ({ ...ds, data: ds.data.slice(-pts) }));
+  chart.update('none');
+}
+
+function pushToChart(readings){
+  const sample = readings.find(r => r.timestamp); if(!sample) return;
+  const ts = new Date(sample.timestamp).toTimeString().slice(0,8);
+  tsLabels.push(ts);
+  
+  if(tsLabels.length > 21600){
+    tsLabels.shift();
+    allDS.forEach(ds => ds.forEach(d => { if(d.data.length) d.data.shift() }));
+    if(energyChart.data.labels.length > 21600){ energyChart.data.labels.shift(); energyChart.data.datasets[0].data.shift(); }
+  }
+  
+  const byId = {}; readings.forEach(r => { byId[r.device_id] = parseFloat(r.value) });
+  const ctrlModeEl = document.getElementById('ctrlMode');
+    if (ctrlModeEl && ctrlModeEl.value === 'MANUAL') {
+    const sliderVal = document.getElementById('pwmSlider').value;
+    byId['PM-01'] = parseFloat(sliderVal);
+  }
+
+  allDS[0][0].data.push(byId['T-01'] ?? null); allDS[0][1].data.push(byId['T-02'] ?? null); allDS[0][2].data.push(byId['T-03'] ?? null); allDS[0][3].data.push(byId['T-04'] ?? null); allDS[0][4].data.push(byId['T-05'] ?? null); allDS[0][5].data.push(byId['T-06'] ?? null);
+  allDS[1][0].data.push(byId['TA-01'] ?? null); allDS[1][1].data.push(byId['RH-01'] ?? null);
+  allDS[2][0].data.push(byId['V-01'] ?? null);
+  allDS[3][0].data.push(byId['I-01'] ?? null);
+  allDS[4][0].data.push(byId['P-01'] ?? null);
+  allDS[5][0].data.push(byId['PM-01'] ?? null);
+  
+  energyChart.data.labels.push(ts);
+  energyChart.data.datasets[0].data.push(window.globalWattHour);
+  energyChart.update('none');
+
+  updateChartView(); 
+}
+// INTERSEPSI MANUAL: Mengganti data peladen dengan nilai slider saat mode manual
+
+
+
+function buildLegend(){
+  const row = document.getElementById('legendRow'); if(!row) return;
+  row.innerHTML = '';
+  allDS[activeTab].forEach(ds => {
+    const s = document.createElement('span'); s.className = 'legend-item';
+    s.innerHTML = `<span class="legend-swatch" style="background:${ds.borderColor}"></span>${ds.label}`;
+    row.appendChild(s);
+  });
+}
+buildLegend();
+
+function switchTab(i){
+  activeTab = i;
+  document.querySelectorAll('.tab-btn').forEach((b, idx) => {
+    b.classList.toggle('active', idx === i);
+    b.style.color = idx === i ? tabColors[i] : '';
+    b.style.borderBottomColor = idx === i ? tabColors[i] : 'transparent';
+  });
+  updateChartView(); buildLegend();
+}
+
+function setRange(seconds){
+  CURRENT_RANGE_PTS = Math.ceil(seconds / 2);
+  updateChartView();
+  document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+  if(window.event && window.event.target) window.event.target.classList.add('active');
+}
+
+/* ── KENDALI MANUAL AKTUATOR ── */
+function toggleControlMode() {
+  const mode = document.getElementById('ctrlMode').value;
+  const controls = document.getElementById('manualControls');
+  const slider = document.getElementById('pwmSlider');
+  
+  if (mode === 'MANUAL') {
+    // Nyalakan visual dan fungsionalitas slider
+    controls.style.opacity = '1';
+    slider.disabled = false;
+  } else {
+    // Matikan fungsionalitas slider agar aman dari klik tidak sengaja
+    controls.style.opacity = '0.4';
+    slider.disabled = true;
+    console.log("[SISTEM] Kendali dikembalikan ke algoritma PID otomatis.");
+  }
+}
+
+function updateSliderDisp(val) {
+  // Memperbarui angka secara waktu-nyata saat slider digeser
+  document.getElementById('pwmValDisp').textContent = val;
+  document.getElementById('pwmPctDisp').textContent = Math.round((val / 255) * 100) + '%';
+}
+
+function sendManualPWM(val) {
+  // Perbarui indikator antarmuka secara langsung
+  applyPumpStatus('PM-01', val);
+  console.log("[SISTEM] Transmisi PWM Manual ke ESP32 disiapkan:", val);
+  // Logika pengiriman (Firebase.setFloat) akan ditambahkan di sini saat integrasi perangkat keras
+}
+
+/* ── LOGIKA PEMROSESAN DATA ── */
+const SENSOR_MAP = {
+  'T-01': {val:'t1val', bar:'t1bar', trend:'t1trend', card:'txcard-t1', max:100, dec:1}, 'T-02': {val:'t2val', bar:'t2bar', trend:'t2trend', card:'txcard-t2', max:100, dec:1}, 'T-03': {val:'t3val', bar:'t3bar', trend:'t3trend', card:'txcard-t3', max:100, dec:1}, 'T-04': {val:'t4val', bar:'t4bar', trend:'t4trend', card:'txcard-t4', max:100, dec:1}, 'T-05': {val:'t5val', bar:'t5bar', trend:'t5trend', card:'txcard-t5', max:100, dec:1}, 'T-06': {val:'t6val', bar:'t6bar', trend:'t6trend', card:'txcard-t6', max:100, dec:1},
+  'TA-01': {val:'ta1val', bar:null, trend:null, card:null, max:100, dec:1}, 'RH-01': {val:'rh1val', bar:null, trend:null, card:null, max:100, dec:1},
+  'V-01': {val:'v1val', bar:null, trend:null, card:null, max:25, dec:2}, 'I-01': {val:'i1val', bar:null, trend:null, card:null, max:5, dec:2}, 'P-01': {val:'p1val', bar:null, trend:null, card:null, max:60, dec:2}
+};
+const PUMP_MAP = { 'PM-01': {rpm:'pm1pwm', load:'pm1load', bar:'pm1bar', rpmMax:255, card:'pcard-pm1', icon:'picon-pm1'} };
+const prevVals = {};
+
+function trendHTML(cur,prev){
+  const d=cur-prev; if(Math.abs(d)<0.001) return `<span class="trend-st"><i class="ti ti-minus"></i></span>`;
+  return d>0?`<span class="trend-up"><i class="ti ti-trending-up"></i></span>`:`<span class="trend-dn"><i class="ti ti-trending-down"></i></span>`;
+}
+
+function applySensorReading(id,value){
+  const cfg=SENSOR_MAP[id]; if(!cfg) return;
+  const n=parseFloat(value); if(isNaN(n)) return;
+  const disp=cfg.dec===0?Math.round(n):n.toFixed(cfg.dec);
+  const valEl=document.getElementById(cfg.val);
+  const barEl=document.getElementById(cfg.bar);
+  const trendEl=document.getElementById(cfg.trend);
+  if(valEl) valEl.textContent=disp;
+  if(barEl) barEl.style.width=Math.min(100,(n/cfg.max*100)).toFixed(1)+'%';
+  if(trendEl&&prevVals[id]!==undefined) trendEl.innerHTML=trendHTML(n,prevVals[id]);
+  prevVals[id]=n;
+}
+
+function applyPumpStatus(id,value){
+  const cfg=PUMP_MAP[id]; if(!cfg) return;
+  const n=parseFloat(value); const isRun=n>0;
+  const pct=Math.min(100,(n/cfg.rpmMax*100)).toFixed(0);
+  const cardEl=document.getElementById(cfg.card);
+  const iconEl=document.getElementById(cfg.icon);
+  const badge=cardEl?cardEl.querySelector('.pump-status-badge'):null;
+  if(document.getElementById(cfg.rpm)) document.getElementById(cfg.rpm).textContent=Math.round(n);
+  if(cfg.load&&document.getElementById(cfg.load)) document.getElementById(cfg.load).textContent=pct;
+  if(document.getElementById(cfg.bar)) document.getElementById(cfg.bar).style.width=pct+'%';
+  if(cardEl) cardEl.classList.toggle('running',isRun);
+  if(iconEl) iconEl.classList.toggle('running',isRun);
+  if(badge){ badge.className='pump-status-badge '+(isRun?'badge-run':'badge-stop'); badge.textContent=isRun?'Running':'Stop'; }
+}
+
+function processPayload(payload){
+  const readings=[];
+  if(Array.isArray(payload.sensors)){
+    payload.sensors.forEach(s=>{ if(s.value!==null&&s.value!==undefined) readings.push({device_id:s.id,value:s.value,timestamp:s.recorded_at}); });
+  }
+  if(Array.isArray(payload.devices)){
+    payload.devices.forEach(d=>{
+      const extra=d.extra||(d.extra_json?JSON.parse(d.extra_json):null);
+      if(d.type==='pump'){ const pwm = extra ? (extra.pwm || 0) : (d.status === 'running' ? 255 : 0); readings.push({device_id:d.id,value:pwm,timestamp:d.updated_at}); }
+    });
+  }
+  if(readings.length===0) return;
+  
+  readings.forEach(r=>{
+  if(SENSOR_MAP[r.device_id]) applySensorReading(r.device_id,r.value);
+  else if(PUMP_MAP[r.device_id]) {
+    // Intersepsi: Periksa apakah mode Manual sedang aktif
+    const isManual = document.getElementById('ctrlMode') && document.getElementById('ctrlMode').value === 'MANUAL';
+
+    if (r.device_id === 'PM-01' && isManual) {
+      // Abaikan data dari server, biarkan slider yang mengontrol
+    } else {
+      applyPumpStatus(r.device_id, r.value);
+    }
+  }
+});
+
+  document.getElementById('statusText').textContent='SEMUA SISTEM AKTIF';
+  document.getElementById('updateInterval').textContent='Live — WebSocket';
+  document.getElementById('connDot').style.background='var(--accent2)';
+  document.getElementById('connDot').style.boxShadow='0 0 8px var(--accent2)';
+
+  let totalT = 0, countT = 0;
+  ['T-01', 'T-02', 'T-03', 'T-04', 'T-05', 'T-06'].forEach(id => { if (prevVals[id] !== undefined) { totalT += prevVals[id]; countT++; } });
+  
+  if (countT > 0) {
+    const avgT = (totalT / countT);
+    const tavgEl = document.getElementById('tavg-val');
+    if (tavgEl) tavgEl.textContent = avgT.toFixed(1);
+    
+    if (prevVals['TA-01'] !== undefined) {
+        let delta = avgT - prevVals['TA-01'];
+        const deltaEl = document.getElementById('deltat-val');
+        if (deltaEl) {
+            deltaEl.textContent = (delta > 0 ? "+" : "") + delta.toFixed(1);
+            deltaEl.style.color = delta <= 0 ? "#00ff9d" : "#ff6b35";
+        }
+    }
+  }
+
+  // === KALKULASI ENERGI WH (Versi Langsung dari Readings) ===
+  const p01 = readings.find(r => r.device_id === 'P-01');
+  if (p01) {
+      const pValue = parseFloat(p01.value);
+      // Asumsi: interval seeder adalah 2 detik. 2 detik / 3600 = 0.000555 jam.
+      window.totalWattSeconds += (pValue * 2); 
+      window.globalWattHour = window.totalWattSeconds / 3600;
+      
+      const energyEl = document.getElementById('energy-val');
+      if (energyEl) energyEl.textContent = window.globalWattHour.toFixed(3);
+  }
+
+  pushToChart(readings);
+  buildTicker();
+}
+
+/* ── TICKER ── */
+function buildTicker(){
+  const track=document.getElementById('tickerTrack'); if(!track) return;
+  track.innerHTML=''; const items=[];
+  let tavg = document.getElementById('tavg-val') ? document.getElementById('tavg-val').textContent : '0';
+  let deltat = document.getElementById('deltat-val') ? document.getElementById('deltat-val').textContent : '0';
+  let pwm = document.getElementById('pm1pwm') ? document.getElementById('pm1pwm').textContent : '0';
+  let power = document.getElementById('p1val') ? document.getElementById('p1val').textContent : '0';
+
+  items.push({text:`SISTEM PENDINGIN AKTIF VIPV: BEROPERASI`, cls:'t-ok'});
+  items.push({text:`SUHU RATA-RATA PANEL: ${tavg} °C`, cls:'t-info'});
+  items.push({text:`EFEKTIVITAS PENDINGINAN (ΔT): ${deltat} °C`, cls:'t-ok'});
+  items.push({text:`DAYA LISTRIK BERSIH: ${power} Watt`, cls:'t-warn'});
+  items.push({text:`OUTPUT MODULASI PID: ${pwm} PWM`, cls:'t-info'});
+
+  [...items,...items,...items].forEach(item=>{
+    const el=document.createElement('span'); el.className='ticker-item '+item.cls;
+    el.innerHTML=`<div class="ticker-dot"></div>${item.text}`; track.appendChild(el);
+  });
+}
+buildTicker();
+
+/* ── SERVER CONFIG ── */
+/* ── KONFIGURASI FIREBASE CLOUD ── */
+// PERHATIAN: Ganti teks di dalam tanda kutip dengan kunci dari Firebase Console Anda
+const firebaseConfig = {
+  apiKey: "AIzaSyDZ9D3YcUpq_h0_XNiPVt6eWawumjdgra0",
+  authDomain: "vipv-active-cooling.firebaseapp.com",
+  databaseURL: "https://vipv-active-cooling-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "vipv-active-cooling",
+  storageBucket: "vipv-active-cooling.firebasestorage.app",
+  messagingSenderId: "66667924513",
+  appId: "1:66667924513:web:b5a170f2c3e12dcf8b6760"
+};
+
+// 1. Menyalakan Mesin Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// 2. Membangun Jalur ke Pangkalan Data
+const sensorRef = db.ref('sistem_pendingin/sensor_terkini');
+const aktuatorRef = db.ref('sistem_pendingin/kontrol_aktuator');
+
+document.getElementById('statusText').textContent = 'MENGHUBUNGKAN KE FIREBASE...';
+
+// 3. Mendengarkan Pembaruan Data Waktu-Nyata (Pengganti WebSocket)
+sensorRef.on('value', (snapshot) => {
+  const data = snapshot.val();
+  if (data) {
+    // Membentuk ulang struktur JSON Firebase agar kompatibel dengan fungsi proses dasbor
+    const payload = { sensors: [], devices: [] };
+    
+    // Memetakan nilai sensor
+    Object.keys(data).forEach(key => {
+      if (key !== 'PM-01') {
+        payload.sensors.push({ id: key, value: data[key], recorded_at: new Date().toISOString() });
+      }
+    });
+    
+    // Memetakan nilai aktuator pompa
+    if (data['PM-01'] !== undefined) {
+      payload.devices.push({
+        id: 'PM-01', type: 'pump', status: data['PM-01'] > 0 ? 'running' : 'stop',
+        extra: { pwm: data['PM-01'] }, updated_at: new Date().toISOString()
+      });
+    }
+    
+    processPayload(payload);
+    
+    document.getElementById('statusText').textContent = 'SISTEM CLOUD AKTIF — FIREBASE RTDB';
+    document.getElementById('updateInterval').textContent = 'Live — Cloud Sync';
+    document.getElementById('connDot').style.background = '#00ff9d';
+    document.getElementById('connDot').style.boxShadow = '0 0 8px #00ff9d';
+  }
+}, (error) => {
+  document.getElementById('statusText').textContent = 'GAGAL MEMBACA PANGKALAN DATA CLOUD';
+  document.getElementById('connDot').style.background = '#ff4444';
+  document.getElementById('connDot').style.boxShadow = '0 0 8px #ff4444';
+});
+
+</script>
+</body>
+</html>
