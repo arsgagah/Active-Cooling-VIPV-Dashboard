@@ -1112,62 +1112,96 @@ function buildTicker(){
 buildTicker();
 
 /* ── SERVER CONFIG ── */
-/* ── KONFIGURASI FIREBASE CLOUD ── */
-// PERHATIAN: Ganti teks di dalam tanda kutip dengan kunci dari Firebase Console Anda
-const firebaseConfig = {
-  apiKey: "AIzaSyDZ9D3YcUpq_h0_XNiPVt6eWawumjdgra0",
-  authDomain: "vipv-active-cooling.firebaseapp.com",
-  databaseURL: "https://vipv-active-cooling-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "vipv-active-cooling",
-  storageBucket: "vipv-active-cooling.firebasestorage.app",
-  messagingSenderId: "66667924513",
-  appId: "1:66667924513:web:b5a170f2c3e12dcf8b6760"
-};
+/* ── KONFIGURASI FIREBASE CLOUD WEB SDK ── */
+// Memuat pustaka Firebase
+const script1 = document.createElement('script');
+script1.src = "https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js";
+document.head.appendChild(script1);
 
-// 1. Menyalakan Mesin Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+const script2 = document.createElement('script');
+script2.src = "https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js";
+document.head.appendChild(script2);
 
-// 2. Membangun Jalur ke Pangkalan Data
-const sensorRef = db.ref('sistem_pendingin/sensor_terkini');
-const aktuatorRef = db.ref('sistem_pendingin/kontrol_aktuator');
+script2.onload = function() {
+  const firebaseConfig = {
+    apiKey: "AIzaSyDZ9D3YcUpq_h0_XNiPVt6eWawumjdgra0",
+    databaseURL: "https://vipv-active-cooling-default-rtdb.asia-southeast1.firebasedatabase.app/"
+  };
+  
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
-document.getElementById('statusText').textContent = 'MENGHUBUNGKAN KE FIREBASE...';
+  document.getElementById('statusText').textContent = 'MENGHUBUNGKAN KE CLOUD...';
 
-// 3. Mendengarkan Pembaruan Data Waktu-Nyata (Pengganti WebSocket)
-sensorRef.on('value', (snapshot) => {
-  const data = snapshot.val();
-  if (data) {
-    // Membentuk ulang struktur JSON Firebase agar kompatibel dengan fungsi proses dasbor
+  // Membaca pembaruan data secara langsung (Realtime Listener)
+  db.ref('sistem_pendingin').on('value', (snapshot) => {
+    const data = snapshot.val();
+    if (!data) return;
+
     const payload = { sensors: [], devices: [] };
-    
-    // Memetakan nilai sensor
-    Object.keys(data).forEach(key => {
-      if (key !== 'PM-01') {
-        payload.sensors.push({ id: key, value: data[key], recorded_at: new Date().toISOString() });
+
+    // Mengekstrak data sensor suhu dan kelistrikan
+    if (data.sensor_terkini) {
+      const s = data.sensor_terkini;
+      for (const key in s) {
+        payload.sensors.push({ id: key, value: s[key], recorded_at: new Date().toISOString() });
       }
-    });
-    
-    // Memetakan nilai aktuator pompa
-    if (data['PM-01'] !== undefined) {
-      payload.devices.push({
-        id: 'PM-01', type: 'pump', status: data['PM-01'] > 0 ? 'running' : 'stop',
-        extra: { pwm: data['PM-01'] }, updated_at: new Date().toISOString()
-      });
     }
-    
+
+    // Mengekstrak data kendali aktuator
+    if (data.kontrol_aktuator) {
+      const k = data.kontrol_aktuator;
+      payload.devices.push({
+        id: 'PM-01', type: 'pump', 
+        status: k['PM-01'] > 0 ? 'running' : 'stop',
+        extra: { pwm: k['PM-01'] },
+        updated_at: new Date().toISOString()
+      });
+      
+      const modeEl = document.getElementById('ctrlMode');
+      if (modeEl && k['MODE']) modeEl.value = k['MODE'];
+    }
+
+    // Mengirim data ke mesin grafik dasbor
     processPayload(payload);
-    
-    document.getElementById('statusText').textContent = 'SISTEM CLOUD AKTIF — FIREBASE RTDB';
+
+    document.getElementById('statusText').textContent = 'SISTEM CLOUD FIREBASE AKTIF';
     document.getElementById('updateInterval').textContent = 'Live — Cloud Sync';
     document.getElementById('connDot').style.background = '#00ff9d';
     document.getElementById('connDot').style.boxShadow = '0 0 8px #00ff9d';
+  });
+};
+
+/* ── MODIFIKASI KENDALI MANUAL UNTUK FIREBASE ── */
+function sendManualPWM(val) {
+  applyPumpStatus('PM-01', val);
+  if (typeof firebase !== 'undefined') {
+    firebase.database().ref('sistem_pendingin/kontrol_aktuator').update({
+      'PM-01': parseInt(val),
+      'MODE': 'MANUAL'
+    });
   }
-}, (error) => {
-  document.getElementById('statusText').textContent = 'GAGAL MEMBACA PANGKALAN DATA CLOUD';
-  document.getElementById('connDot').style.background = '#ff4444';
-  document.getElementById('connDot').style.boxShadow = '0 0 8px #ff4444';
-});
+}
+
+function toggleControlMode() {
+  const mode = document.getElementById('ctrlMode').value;
+  const controls = document.getElementById('manualControls');
+  const slider = document.getElementById('pwmSlider');
+  
+  if (mode === 'MANUAL') {
+    controls.style.opacity = '1';
+    slider.disabled = false;
+  } else {
+    controls.style.opacity = '0.4';
+    slider.disabled = true;
+  }
+  
+  if (typeof firebase !== 'undefined') {
+    firebase.database().ref('sistem_pendingin/kontrol_aktuator').update({
+      'MODE': mode
+    });
+  }
+}
 
 </script>
 </body>
