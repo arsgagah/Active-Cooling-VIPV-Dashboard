@@ -765,83 +765,45 @@ function openExportModal(){ document.getElementById('exportModal').classList.add
 
 
 /* ── DATA EKSPOR ── */
-/* ── FUNGSI EKSTRAKSI DATA MENTAH ── */
-async function doExport(){
-  const sensor = document.getElementById('expSensor').value;
-  const minutes = document.getElementById('expMinutes').value;
-  const format = document.getElementById('expFormat').value;
-  
-  try {
-    let csvData = '';
-    let exportFileName = '';
+/* ── FUNGSI EKSPOR DATA FIREBASE ── */
+// Catatan: Pastikan nama fungsi ini sama dengan atribut onclick pada tombol "DOWNLOAD" di HTML Anda
+function exportData() { 
+  // Menampilkan indikator proses
+  const btn = document.querySelector('.btn-download') || document.getElementById('downloadBtn');
+  const teksAsli = btn ? btn.textContent : 'DOWNLOAD';
+  if (btn) btn.textContent = "MENGUNDUH...";
 
-    if (sensor === 'ALL') {
-      const sensorList = ['T-01','T-02','T-03','T-04','T-05','T-06','TA-01','RH-01','V-01','I-01','P-01','PM-01'];
-      const combinedData = {};
-      const timestampSet = new Set();
-
-      // Menarik data paralel dari database
-      const fetchPromises = sensorList.map(s => fetch(`${API_BASE}/api/history/${s}?minutes=${minutes}`).then(r => r.json()));
-      const results = await Promise.all(fetchPromises);
-
-      results.forEach((json, index) => {
-        const currentSensor = sensorList[index];
-        if (json.data) {
-          json.data.forEach(record => {
-            const ts = record.recorded_at || record.updated_at;
-            if(!combinedData[ts]) combinedData[ts] = {};
-            combinedData[ts][currentSensor] = record.value;
-            timestampSet.add(ts);
-          });
-        }
-      });
-
-      const sortedTimestamps = Array.from(timestampSet).sort();
-      if (sortedTimestamps.length === 0) { alert('Tidak ada data pada rentang waktu tersebut.'); return; }
-
-      if (format === 'csv') {
-        const header = ['Timestamp', ...sensorList].join(',');
-        const rows = sortedTimestamps.map(ts => {
-          const rowValues = [ts];
-          sensorList.forEach(s => {
-            rowValues.push(combinedData[ts][s] !== undefined ? combinedData[ts][s] : '');
-          });
-          return rowValues.join(',');
-        });
-        csvData = header + '\n' + rows.join('\n');
-        exportFileName = `Data_Terpadu_${minutes}mnt.csv`;
-      } else {
-        const jsonObj = sortedTimestamps.map(ts => ({ timestamp: ts, ...combinedData[ts] }));
-        csvData = JSON.stringify(jsonObj, null, 2);
-        exportFileName = `Data_Terpadu_${minutes}mnt.json`;
-      }
-
-    } else {
-      const res = await fetch(`${API_BASE}/api/history/${sensor}?minutes=${minutes}`);
-      const json = await res.json();
-      const rows = json.data || [];
-      if(rows.length === 0){ alert('Tidak ada data pada rentang waktu tersebut.'); return; }
-
-      if(format === 'csv'){
-        csvData = 'timestamp,value\n' + rows.map(r => `${r.recorded_at || r.updated_at},${r.value}`).join('\n');
-        exportFileName = `${sensor}_${minutes}mnt.csv`;
-      } else {
-        csvData = JSON.stringify(rows, null, 2);
-        exportFileName = `${sensor}_${minutes}mnt.json`;
-      }
+  // Menarik seluruh data dari direktori histori di Firebase
+  firebase.database().ref('sistem_pendingin/histori').once('value').then((snapshot) => {
+    const data = snapshot.val();
+    
+    if (!data) {
+      alert("Belum ada rekam jejak data di pangkalan data.");
+      if (btn) btn.textContent = teksAsli;
+      return;
     }
 
-    const fileType = format === 'csv' ? 'text/csv' : 'application/json';
-    const blobObject = new Blob([csvData], {type: fileType});
-    const anchorElement = document.createElement('a');
-    anchorElement.href = URL.createObjectURL(blobObject);
-    anchorElement.download = exportFileName;
-    anchorElement.click();
-    closeModal('exportModal');
+    // Mengubah format objek Firebase menjadi struktur Array
+    const records = Object.values(data);
 
-  } catch(error){ 
-    alert('Sistem gagal mengambil data. Pastikan server aktif. Kesalahan: ' + error.message); 
-  }
+    // Mengonversi Array menjadi format file JSON
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(records, null, 2));
+    
+    // Proses memicu unduhan di peramban web
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "Histori_Pendingin_PV.json");
+    document.body.appendChild(downloadAnchorNode); 
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+
+    if (btn) btn.textContent = teksAsli;
+    
+  }).catch((error) => {
+    console.error("Galat unduhan:", error);
+    alert("Gagal mengunduh data: " + error.message);
+    if (btn) btn.textContent = teksAsli;
+  });
 }
 
 /* ── KONFIGURASI GRAFIK ── */
