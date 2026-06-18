@@ -766,42 +766,95 @@ function openExportModal(){ document.getElementById('exportModal').classList.add
 
 /* ── DATA EKSPOR ── */
 /* ── FUNGSI EKSPOR DATA FIREBASE ── */
-// Catatan: Pastikan nama fungsi ini sama dengan atribut onclick pada tombol "DOWNLOAD" di HTML Anda
-function exportData() { 
-  // Menampilkan indikator proses
-  const btn = document.querySelector('.btn-download') || document.getElementById('downloadBtn');
+function exportData() {
+  // Mengambil referensi elemen persis sesuai dengan ID di HTML Anda
+  const elSensor = document.getElementById('expSensor');
+  const elWaktu = document.getElementById('expMinutes');
+  const elFormat = document.getElementById('expFormat');
+
+  if (!elSensor || !elWaktu || !elFormat) {
+    alert("Elemen dropdown tidak ditemukan. Pastikan ID di HTML sudah sesuai.");
+    return;
+  }
+
+  const pilihanSensor = elSensor.value; 
+  const rentangWaktuMenit = parseInt(elWaktu.value); // Membaca dalam satuan menit
+  const formatData = elFormat.value.toUpperCase();   // Mengubah 'csv' menjadi 'CSV'
+
+  // Indikator visual saat proses berjalan
+  // Sesuaikan selector ini jika tombol download Anda memiliki class/id berbeda
+  const btn = document.querySelector('button[onclick*="exportData"]') || document.querySelector('.btn-download');
   const teksAsli = btn ? btn.textContent : 'DOWNLOAD';
   if (btn) btn.textContent = "MENGUNDUH...";
 
-  // Menarik seluruh data dari direktori histori di Firebase
+  // Menarik data dari direktori histori di Firebase
   firebase.database().ref('sistem_pendingin/histori').once('value').then((snapshot) => {
     const data = snapshot.val();
-    
     if (!data) {
-      alert("Belum ada rekam jejak data di pangkalan data.");
+      alert("Data histori belum tersedia di pangkalan data.");
       if (btn) btn.textContent = teksAsli;
       return;
     }
 
-    // Mengubah format objek Firebase menjadi struktur Array
-    const records = Object.values(data);
+    let records = Object.values(data);
+    const waktuSekarang = new Date().getTime();
 
-    // Mengonversi Array menjadi format file JSON
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(records, null, 2));
+    // 1. Pemfilteran Rentang Waktu (Kalkulasi dalam Menit)
+    records = records.filter(record => {
+      if (!record.waktu) return false;
+      const stringWaktu = record.waktu.replace(/-/g, '/'); 
+      const waktuRecord = new Date(stringWaktu).getTime();
+      const selisihMenit = (waktuSekarang - waktuRecord) / (1000 * 60); // Dibagi 60 ribu ms untuk konversi ke menit
+      return selisihMenit <= rentangWaktuMenit;
+    });
+
+    if (records.length === 0) {
+      alert("Tidak ada rekaman data pada rentang waktu yang dipilih.");
+      if (btn) btn.textContent = teksAsli;
+      return;
+    }
+
+    // 2. Pemfilteran Sensor Spesifik
+    let dataAkhir = records;
+    if (pilihanSensor !== 'ALL') {
+      dataAkhir = records.map(record => {
+        return {
+          waktu: record.waktu,
+          [pilihanSensor]: record[pilihanSensor] !== undefined ? record[pilihanSensor] : null
+        };
+      });
+    }
+
+    // 3. Proses Penyusunan Berkas (JSON atau CSV)
+    let dataStr = "";
+    let namaFile = "";
     
-    // Proses memicu unduhan di peramban web
-    const downloadAnchorNode = document.createElement('a');
-    downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", "Histori_Pendingin_PV.json");
-    document.body.appendChild(downloadAnchorNode); 
-    downloadAnchorNode.click();
-    downloadAnchorNode.remove();
+    // Pembuatan nama fail dinamis (misal: Histori_T-01_60Menit.csv)
+    let rentangTeks = rentangWaktuMenit >= 60 ? (rentangWaktuMenit/60) + "Jam" : rentangWaktuMenit + "Menit";
+    if (rentangWaktuMenit === 999999) rentangTeks = "Semua";
+
+    if (formatData === 'JSON') {
+      dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataAkhir, null, 2));
+      namaFile = `Histori_${pilihanSensor}_${rentangTeks}.json`;
+    } else {
+      const headers = Object.keys(dataAkhir[0]).join(",");
+      const rows = dataAkhir.map(obj => Object.values(obj).join(",")).join("\n");
+      dataStr = "data:text/csv;charset=utf-8," + encodeURIComponent(headers + "\n" + rows);
+      namaFile = `Histori_${pilihanSensor}_${rentangTeks}.csv`;
+    }
+
+    // 4. Memicu Pengunduhan di Peramban
+    const anchor = document.createElement('a');
+    anchor.setAttribute("href", dataStr);
+    anchor.setAttribute("download", namaFile);
+    document.body.appendChild(anchor); 
+    anchor.click();
+    anchor.remove();
 
     if (btn) btn.textContent = teksAsli;
     
   }).catch((error) => {
-    console.error("Galat unduhan:", error);
-    alert("Gagal mengunduh data: " + error.message);
+    alert("Galat komunikasi dengan Firebase: " + error.message);
     if (btn) btn.textContent = teksAsli;
   });
 }
