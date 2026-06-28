@@ -659,57 +659,63 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;displ
 </div>
 
 <div id="exportModal" class="modal-overlay">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 style="color: var(--text); font-family: 'Exo 2', sans-serif;"><i class="ti ti-download"></i> Ekspor Data Pengujian</h3>
-        <button class="close-btn" onclick="closeModal('exportModal')" style="background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px;"><i class="ti ti-x"></i></button>
+  <div class="modal-box">
+    <div class="modal-title">
+      <i class="ti ti-download"></i> Ekspor Data Pengujian
+      <button onclick="closeModal('exportModal')" style="margin-left:auto; background:none; border:none; color:var(--muted); cursor:pointer; font-size:16px;"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body" style="display: flex; flex-direction: column; gap: 15px; margin-top: 5px;">
+      
+      <div style="display: flex; flex-direction: column; gap: 5px;">
+        <label style="font-size: 11px; color: var(--muted);">Sumber Instrumen (Node):</label>
+        <select class="modal-select" id="expSource">
+          <option value="sistem_pendingin">Panel Aktif (Sistem Pendingin)</option>
+          <option value="sistem_kontrol">Panel Pembanding (Sistem Kontrol)</option>
+        </select>
       </div>
-      <div class="modal-body" style="display: flex; flex-direction: column; gap: 15px; margin-top: 15px;">
-        
-        <div style="display: flex; flex-direction: column; gap: 5px;">
-          <label style="font-size: 11px; color: var(--muted);">Parameter Ekstraksi:</label>
-          <select class="modal-select" id="expSensor" style="padding: 8px; background: var(--panel); border: 1px solid var(--border); color: var(--text); border-radius: 4px; outline: none;">
-            <option value="ALL">Semua Parameter (Tabel Gabungan)</option>
-            <option value="T-01">T-01 · Suhu Panel 1</option>
-            <option value="T-02">T-02 · Suhu Panel 2</option>
-            <option value="T-03">T-03 · Suhu Panel 3</option>
-            <option value="T-04">T-04 · Suhu Panel 4</option>
-            <option value="T-05">T-05 · Suhu Panel 5</option>
-            <option value="T-06">T-06 · Suhu Panel 6</option>
-            <option value="TA-01">TA-01 · Suhu Ambien</option>
-            <option value="RH-01">RH-01 · Kelembapan Udara</option>
-            <option value="V-01">V-01 · Tegangan Panel</option>
-            <option value="I-01">I-01 · Arus Panel</option>
-            <option value="P-01">P-01 · Daya Listrik</option>
-            <option value="PM-01">PM-01 · Sinyal PWM Pompa</option>
-          </select>
-        </div>
 
-        <div style="display: flex; flex-direction: column; gap: 5px;">
-          <label style="font-size: 11px; color: var(--muted);">Rentang Waktu Rekaman:</label>
-          <select class="modal-select" id="expMinutes" style="padding: 8px; background: var(--panel); border: 1px solid var(--border); color: var(--text); border-radius: 4px; outline: none;">
-            <option value="15">15 Menit Terakhir</option>
-            <option value="60">1 Jam Terakhir</option>
-            <option value="360">6 Jam Terakhir</option>
-            <option value="480">8 Jam Terakhir</option>
-            <option value="720">12 Jam Terakhir</option>
-            <option value="1440">24 Jam Terakhir</option>
-            <option value="999999">Seluruh Data Tersimpan</option>
-          </select>
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 5px;">
-          <label style="font-size: 11px; color: var(--muted);">Format Keluaran:</label>
-          <select class="modal-select" id="expFormat" style="padding: 8px; background: var(--panel); border: 1px solid var(--border); color: var(--text); border-radius: 4px; outline: none;">
-            <option value="csv">CSV (Kompatibel dengan Excel)</option>
-            <option value="json">JSON (Data Mentah Program)</option>
-          </select>
-        </div>
-
-        <button class="export-btn" onclick="exportData()" style="margin-top: 10px; padding: 10px; background: var(--accent2); color: #000; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Unduh Berkas</button>
+      <div style="display: flex; flex-direction: column; gap: 5px;">
+        <label style="font-size: 11px; color: var(--muted);">Parameter Ekstraksi:</label>
+        <select class="modal-select" id="expSensor">
+          <option value="ALL">Semua Parameter (Tabel Gabungan)</option>
+          <option value="T_panel">Suhu Rata-rata Panel (°C)</option>
+          <option value="tegangan_V">Tegangan Panel (Volt)</option>
+          <option value="arus_A">Arus Panel (Ampere)</option>
+          <option value="daya_W">Daya Listrik (Watt)</option>
+          <option value="T-01">T-01 · Suhu Panel 1</option>
+          <option value="T-02">T-02 · Suhu Panel 2</option>
+          <option value="T-03">T-03 · Suhu Panel 3</option>
+          <option value="T-04">T-04 · Suhu Panel 4</option>
+          <option value="T-05">T-05 · Suhu Panel 5</option>
+          <option value="T-06">T-06 · Suhu Panel 6</option>
+        </select>
       </div>
+
+      <div style="display: flex; flex-direction: column; gap: 5px;">
+        <label style="font-size: 11px; color: var(--muted);">Rentang Waktu Rekaman:</label>
+        <select class="modal-select" id="expMinutes">
+          <option value="15">15 Menit Terakhir</option>
+          <option value="60">1 Jam Terakhir</option>
+          <option value="360">6 Jam Terakhir</option>
+          <option value="480">8 Jam Terakhir</option>
+          <option value="720">12 Jam Terakhir</option>
+          <option value="1440">24 Jam Terakhir</option>
+          <option value="999999">Seluruh Data Tersimpan</option>
+        </select>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 5px;">
+        <label style="font-size: 11px; color: var(--muted);">Format Keluaran:</label>
+        <select class="modal-select" id="expFormat">
+          <option value="csv">CSV (Kompatibel dengan Excel/MATLAB)</option>
+          <option value="json">JSON (Data Mentah Program)</option>
+        </select>
+      </div>
+
+      <button class="export-btn" onclick="exportData()" style="margin-top: 10px; padding: 10px; background: var(--accent2); color: #000; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Unduh Berkas</button>
     </div>
   </div>
+</div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -767,31 +773,32 @@ function openExportModal(){ document.getElementById('exportModal').classList.add
 /* ── DATA EKSPOR ── */
 /* ── FUNGSI EKSPOR DATA FIREBASE ── */
 function exportData() {
-  // Mengambil referensi elemen persis sesuai dengan ID di HTML Anda
+  const elSource = document.getElementById('expSource');
   const elSensor = document.getElementById('expSensor');
   const elWaktu = document.getElementById('expMinutes');
   const elFormat = document.getElementById('expFormat');
 
-  if (!elSensor || !elWaktu || !elFormat) {
-    alert("Elemen dropdown tidak ditemukan. Pastikan ID di HTML sudah sesuai.");
+  if (!elSource || !elSensor || !elWaktu || !elFormat) {
+    alert("Elemen formulir tidak ditemukan.");
     return;
   }
 
+  const sumberData = elSource.value; // 'sistem_pendingin' atau 'sistem_kontrol'
   const pilihanSensor = elSensor.value; 
-  const rentangWaktuMenit = parseInt(elWaktu.value); // Membaca dalam satuan menit
-  const formatData = elFormat.value.toUpperCase();   // Mengubah 'csv' menjadi 'CSV'
+  const rentangWaktuMenit = parseInt(elWaktu.value);
+  const formatData = elFormat.value.toUpperCase();
 
-  // Indikator visual saat proses berjalan
-  // Sesuaikan selector ini jika tombol download Anda memiliki class/id berbeda
-  const btn = document.querySelector('button[onclick*="exportData"]') || document.querySelector('.btn-download');
-  const teksAsli = btn ? btn.textContent : 'DOWNLOAD';
-  if (btn) btn.textContent = "MENGUNDUH...";
+  const btn = document.querySelector('.export-btn');
+  const teksAsli = btn ? btn.textContent : 'UNDUH';
+  if (btn) btn.textContent = "MENGAMBIL DATA DARI CLOUD...";
 
-  // Menarik data dari direktori histori di Firebase
-  firebase.database().ref('sistem_pendingin/histori').once('value').then((snapshot) => {
+  // Menarik data dari direktori historis yang dipilih
+  const pathDatabase = sumberData + '/histori';
+  
+  firebase.database().ref(pathDatabase).once('value').then((snapshot) => {
     const data = snapshot.val();
     if (!data) {
-      alert("Data histori belum tersedia di pangkalan data.");
+      alert("Tidak ada rekaman data pada direktori " + (sumberData === 'sistem_pendingin' ? 'Aktif' : 'Kontrol') + ".");
       if (btn) btn.textContent = teksAsli;
       return;
     }
@@ -799,22 +806,22 @@ function exportData() {
     let records = Object.values(data);
     const waktuSekarang = new Date().getTime();
 
-    // 1. Pemfilteran Rentang Waktu (Kalkulasi dalam Menit)
+    // Filter berdasarkan rentang waktu
     records = records.filter(record => {
       if (!record.waktu) return false;
       const stringWaktu = record.waktu.replace(/-/g, '/'); 
       const waktuRecord = new Date(stringWaktu).getTime();
-      const selisihMenit = (waktuSekarang - waktuRecord) / (1000 * 60); // Dibagi 60 ribu ms untuk konversi ke menit
+      const selisihMenit = (waktuSekarang - waktuRecord) / (1000 * 60);
       return selisihMenit <= rentangWaktuMenit;
     });
 
     if (records.length === 0) {
-      alert("Tidak ada rekaman data pada rentang waktu yang dipilih.");
+      alert("Tidak ada data dalam rentang waktu " + rentangWaktuMenit + " menit terakhir.");
       if (btn) btn.textContent = teksAsli;
       return;
     }
 
-    // 2. Pemfilteran Sensor Spesifik
+    // Filter kolom parameter
     let dataAkhir = records;
     if (pilihanSensor !== 'ALL') {
       dataAkhir = records.map(record => {
@@ -825,25 +832,24 @@ function exportData() {
       });
     }
 
-    // 3. Proses Penyusunan Berkas (JSON atau CSV)
+    // Pembuatan berkas keluaran
     let dataStr = "";
-    let namaFile = "";
-    
-    // Pembuatan nama fail dinamis (misal: Histori_T-01_60Menit.csv)
     let rentangTeks = rentangWaktuMenit >= 60 ? (rentangWaktuMenit/60) + "Jam" : rentangWaktuMenit + "Menit";
     if (rentangWaktuMenit === 999999) rentangTeks = "Semua";
+    
+    let namaSistem = sumberData === 'sistem_pendingin' ? 'Aktif' : 'Kontrol';
+    let namaFile = `Dataset_${namaSistem}_${pilihanSensor}_${rentangTeks}`;
 
     if (formatData === 'JSON') {
       dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataAkhir, null, 2));
-      namaFile = `Histori_${pilihanSensor}_${rentangTeks}.json`;
+      namaFile += ".json";
     } else {
       const headers = Object.keys(dataAkhir[0]).join(",");
       const rows = dataAkhir.map(obj => Object.values(obj).join(",")).join("\n");
       dataStr = "data:text/csv;charset=utf-8," + encodeURIComponent(headers + "\n" + rows);
-      namaFile = `Histori_${pilihanSensor}_${rentangTeks}.csv`;
+      namaFile += ".csv";
     }
 
-    // 4. Memicu Pengunduhan di Peramban
     const anchor = document.createElement('a');
     anchor.setAttribute("href", dataStr);
     anchor.setAttribute("download", namaFile);
@@ -854,7 +860,7 @@ function exportData() {
     if (btn) btn.textContent = teksAsli;
     
   }).catch((error) => {
-    alert("Galat komunikasi dengan Firebase: " + error.message);
+    alert("Galat sinkronisasi Firebase: " + error.message);
     if (btn) btn.textContent = teksAsli;
   });
 }
