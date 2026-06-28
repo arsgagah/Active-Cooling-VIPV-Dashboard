@@ -487,6 +487,8 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;displ
             <div class="pump-name">PM-01 · Sinleader 12V 4A</div>
             <div class="pump-stats">
               <span class="pump-rpm"><span id="pm1pwm">—</span> <span style="font-size:7.5px;color:var(--muted)">PWM</span></span>
+              <span style="font-size:8.5px;color:var(--muted); margin-left: 10px;">Daya Pompa:</span>
+              <span style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#ff4444" id="pm1power">— W</span>
               <span style="font-size:8.5px;color:var(--muted)">Duty Cycle:</span>
               <span style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--accent2)" id="pm1load">—</span><span style="font-size:7.5px;color:var(--muted)">%</span>
             </div>
@@ -868,6 +870,16 @@ db.ref('/').on('value', (snapshot) => {
   document.getElementById('pm1load').textContent = pwmPct;
   document.getElementById('pm1bar').style.width = pwmPct + '%';
   
+  // Kalkulasi dan Tampilan Daya Pompa
+  const dayaPompa = (pwm / 255) * 11.6 * 2.6;
+  const elPower = document.getElementById('pm1power');
+  if (elPower) elPower.textContent = dayaPompa.toFixed(2) + " W";
+
+  // Kalkulasi Efektivitas Daya Bersih (Net Power Gain)
+  const pAktif = aktif['P-01'] ? parseFloat(aktif['P-01']) : 0;
+  const pKontrol = kontrol['P-01'] ? parseFloat(kontrol['P-01']) : 0;
+  const netDaya = (pAktif - pKontrol) - dayaPompa;
+
   const pCard = document.getElementById('pcard-pm1');
   const pIcon = document.getElementById('picon-pm1');
   if(pwm > 0) {
@@ -912,7 +924,8 @@ db.ref('/').on('value', (snapshot) => {
       {text:`T-AVG AKTIF: ${tAvgA.toFixed(1)} °C | T-AVG KONTROL: ${tAvgK.toFixed(1)} °C`, cls:'t-info'},
       {text:`EFEKTIVITAS PENDINGINAN (ΔT): ${deltaT.toFixed(1)} °C`, cls:'t-ok'},
       {text:`DAYA AKTIF: ${aktif['P-01'] ? parseFloat(aktif['P-01']).toFixed(2) : 0} W | DAYA KONTROL: ${kontrol['P-01'] ? parseFloat(kontrol['P-01']).toFixed(2) : 0} W`, cls:'t-warn'},
-      {text:`OUTPUT MODULASI PID: ${pwm} PWM (${pwmPct}%)`, cls:'t-info'}
+      {text:`OUTPUT MODULASI PID: ${pwm} PWM (${pwmPct}%)`, cls:'t-info'},
+      {text:`NET EFISIENSI DAYA: ${netDaya.toFixed(2)} W`, cls: (netDaya > 0 ? 't-ok' : 't-err')},
     ];
     // Menduplikasi array secara masif agar animasi CSS tidak pernah terpotong pada layar ultra-wide
     [...items,...items,...items,...items,...items,...items,...items,...items].forEach(item=>{
