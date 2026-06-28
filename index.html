@@ -227,7 +227,8 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;displ
   display: flex;
   gap: 40px; /* Jarak antar teks */
   white-space: nowrap;
-  animation: ticker 30s linear infinite;
+  width: max-content;
+  animation: ticker 40s linear infinite;
   will-change: transform; /* Optimasi performa */
 }
 @keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
@@ -319,13 +320,13 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;displ
 <div class="header">
   <div class="header-left">
     <div class="logo-ring"><i class="ti ti-droplet"></i></div>
-<div>
+    <div>
       <div class="plant-title">Sistem Pendingin PV</div>
-      <div class="plant-sub">Vehicle-Integrated Photovoltaics (VIPV) &nbsp;·&nbsp; Monitoring System v1.0</div>
+      <div class="plant-sub">Vehicle-Integrated Photovoltaics (VIPV) &nbsp;·&nbsp; Monitoring System v2.0</div>
     </div>
   </div>
 
-<div class="header-center" style="gap:6px">
+  <div class="header-center" style="gap:6px">
     <button class="toolbar-btn" onclick="toggleTheme()" id="themeBtn" title="Ganti tema">
       <i class="ti ti-sun" id="themeIcon"></i> <span id="themeLabel">Light</span>
     </button>
@@ -356,305 +357,245 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;displ
 <div class="body-wrap">
   <div class="main-row">
     <div class="transmitters-panel">
-      <div class="section-title"><i class="ti ti-antenna"></i> Transmitter &amp; Sensor — 6 Unit</div>
+      <div class="section-title"><i class="ti ti-antenna"></i> Profil Suhu Permukaan (Aktif vs Kontrol)</div>
       <div class="tx-grid"> 
-        <div class="tx-card" id="txcard-t1">
-          <div class="tx-trend" id="t1trend"><span class="trend-st"><i class="ti ti-minus"></i></span></div>
-          <div class="tx-label"><i class="ti ti-thermometer"></i> Suhu Permukaan</div>
-          <div class="tx-name">T-01 · Suhu Zona 1</div>
-          <div class="tx-value" id="t1val" style="color:#ffb24f">—</div>
-          <div class="tx-unit">°C</div>
-          <div class="gauge-bar"><div class="gauge-fill" id="t1bar" style="width:0%; background:linear-gradient(90deg,#ffde72,#ff6a52)"></div></div>
-          <div class="tx-range"><span>0.0 °C</span><span>100.0 °C</span></div>
+        <div class="tx-card">
+          <div class="tx-name" style="border-bottom: 1px solid var(--grid); padding-bottom: 4px; margin-bottom: 6px;">T-01 · Suhu Zona 1</div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="text-align: left;">
+              <div style="font-size: 8.5px; color: var(--accent2); letter-spacing: 1px;">AKTIF</div>
+              <div class="tx-value" id="t1val" style="color: var(--accent2); font-size: 22px;">—</div>
+            </div>
+            <div style="font-size: 9px; color: var(--muted);">°C</div>
+            <div style="text-align: right;">
+              <div style="font-size: 8.5px; color: var(--accent); letter-spacing: 1px;">KONTROL</div>
+              <div class="tx-value" id="t1ctrl" style="color: var(--accent); font-size: 22px;">—</div>
+            </div>
+          </div>
         </div>
-        <div class="tx-card" id="txcard-t2">
-          <div class="tx-trend" id="t2trend"><span class="trend-st"><i class="ti ti-minus"></i></span></div>
-          <div class="tx-label"><i class="ti ti-thermometer"></i> Suhu Permukaan</div>
-          <div class="tx-name">T-02 · Suhu Zona 2</div>
-          <div class="tx-value" id="t2val" style="color:#ffb24f">—</div>
-          <div class="tx-unit">°C</div>
-          <div class="gauge-bar"><div class="gauge-fill" id="t2bar" style="width:0%; background:linear-gradient(90deg,#ffde72,#ff6a52)"></div></div>
-          <div class="tx-range"><span>0.0 °C</span><span>100.0 °C</span></div>
+        <div class="tx-card">
+          <div class="tx-name" style="border-bottom: 1px solid var(--grid); padding-bottom: 4px; margin-bottom: 6px;">T-02 · Suhu Zona 2</div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="text-align: left;">
+              <div style="font-size: 8.5px; color: var(--accent2); letter-spacing: 1px;">AKTIF</div>
+              <div class="tx-value" id="t2val" style="color: var(--accent2); font-size: 22px;">—</div>
+            </div>
+            <div style="font-size: 9px; color: var(--muted);">°C</div>
+            <div style="text-align: right;">
+              <div style="font-size: 8.5px; color: var(--accent); letter-spacing: 1px;">KONTROL</div>
+              <div class="tx-value" id="t2ctrl" style="color: var(--accent); font-size: 22px;">—</div>
+            </div>
+          </div>
         </div>
-        <div class="tx-card" id="txcard-t3">
-          <div class="tx-trend" id="t3trend"><span class="trend-st"><i class="ti ti-minus"></i></span></div>
-          <div class="tx-label"><i class="ti ti-thermometer"></i> Suhu Permukaan</div>
-          <div class="tx-name">T-03 · Suhu Zona 3</div>
-          <div class="tx-value" id="t3val" style="color:#ffb24f">—</div>
-          <div class="tx-unit">°C</div>
-          <div class="gauge-bar"><div class="gauge-fill" id="t3bar" style="width:0%; background:linear-gradient(90deg,#ffde72,#ff6a52)"></div></div>
-          <div class="tx-range"><span>0.0 °C</span><span>100.0 °C</span></div>
+        <div class="tx-card">
+          <div class="tx-name" style="border-bottom: 1px solid var(--grid); padding-bottom: 4px; margin-bottom: 6px;">T-03 · Suhu Zona 3</div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="text-align: left;">
+              <div style="font-size: 8.5px; color: var(--accent2); letter-spacing: 1px;">AKTIF</div>
+              <div class="tx-value" id="t3val" style="color: var(--accent2); font-size: 22px;">—</div>
+            </div>
+            <div style="font-size: 9px; color: var(--muted);">°C</div>
+            <div style="text-align: right;">
+              <div style="font-size: 8.5px; color: var(--accent); letter-spacing: 1px;">KONTROL</div>
+              <div class="tx-value" id="t3ctrl" style="color: var(--accent); font-size: 22px;">—</div>
+            </div>
+          </div>
         </div>
-        <div class="tx-card" id="txcard-t4">
-          <div class="tx-trend" id="t4trend"><span class="trend-st"><i class="ti ti-minus"></i></span></div>
-          <div class="tx-label"><i class="ti ti-thermometer"></i> Suhu Permukaan</div>
-          <div class="tx-name">T-04 · Suhu Zona 4</div>
-          <div class="tx-value" id="t4val" style="color:#ffb24f">—</div>
-          <div class="tx-unit">°C</div>
-          <div class="gauge-bar"><div class="gauge-fill" id="t4bar" style="width:0%; background:linear-gradient(90deg,#ffde72,#ff6a52)"></div></div>
-          <div class="tx-range"><span>0.0 °C</span><span>100.0 °C</span></div>
+        <div class="tx-card">
+          <div class="tx-name" style="border-bottom: 1px solid var(--grid); padding-bottom: 4px; margin-bottom: 6px;">T-04 · Suhu Zona 4</div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="text-align: left;">
+              <div style="font-size: 8.5px; color: var(--accent2); letter-spacing: 1px;">AKTIF</div>
+              <div class="tx-value" id="t4val" style="color: var(--accent2); font-size: 22px;">—</div>
+            </div>
+            <div style="font-size: 9px; color: var(--muted);">°C</div>
+            <div style="text-align: right;">
+              <div style="font-size: 8.5px; color: var(--accent); letter-spacing: 1px;">KONTROL</div>
+              <div class="tx-value" id="t4ctrl" style="color: var(--accent); font-size: 22px;">—</div>
+            </div>
+          </div>
         </div>
-        <div class="tx-card" id="txcard-t5">
-          <div class="tx-trend" id="t5trend"><span class="trend-st"><i class="ti ti-minus"></i></span></div>
-          <div class="tx-label"><i class="ti ti-thermometer"></i> Suhu Permukaan</div>
-          <div class="tx-name">T-05 · Suhu Zona 5</div>
-          <div class="tx-value" id="t5val" style="color:#ffb24f">—</div>
-          <div class="tx-unit">°C</div>
-          <div class="gauge-bar"><div class="gauge-fill" id="t5bar" style="width:0%; background:linear-gradient(90deg,#ffde72,#ff6a52)"></div></div>
-          <div class="tx-range"><span>0.0 °C</span><span>100.0 °C</span></div>
+        <div class="tx-card">
+          <div class="tx-name" style="border-bottom: 1px solid var(--grid); padding-bottom: 4px; margin-bottom: 6px;">T-05 · Suhu Zona 5</div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="text-align: left;">
+              <div style="font-size: 8.5px; color: var(--accent2); letter-spacing: 1px;">AKTIF</div>
+              <div class="tx-value" id="t5val" style="color: var(--accent2); font-size: 22px;">—</div>
+            </div>
+            <div style="font-size: 9px; color: var(--muted);">°C</div>
+            <div style="text-align: right;">
+              <div style="font-size: 8.5px; color: var(--accent); letter-spacing: 1px;">KONTROL</div>
+              <div class="tx-value" id="t5ctrl" style="color: var(--accent); font-size: 22px;">—</div>
+            </div>
+          </div>
         </div>
-        <div class="tx-card" id="txcard-t6">
-          <div class="tx-trend" id="t6trend"><span class="trend-st"><i class="ti ti-minus"></i></span></div>
-          <div class="tx-label"><i class="ti ti-thermometer"></i> Suhu Permukaan</div>
-          <div class="tx-name">T-06 · Suhu Zona 6</div>
-          <div class="tx-value" id="t6val" style="color:#ffb24f">—</div>
-          <div class="tx-unit">°C</div>
-          <div class="gauge-bar"><div class="gauge-fill" id="t6bar" style="width:0%; background:linear-gradient(90deg,#ffde72,#ff6a52)"></div></div>
-          <div class="tx-range"><span>0.0 °C</span><span>100.0 °C</span></div>
+        <div class="tx-card">
+          <div class="tx-name" style="border-bottom: 1px solid var(--grid); padding-bottom: 4px; margin-bottom: 6px;">T-06 · Suhu Zona 6</div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="text-align: left;">
+              <div style="font-size: 8.5px; color: var(--accent2); letter-spacing: 1px;">AKTIF</div>
+              <div class="tx-value" id="t6val" style="color: var(--accent2); font-size: 22px;">—</div>
+            </div>
+            <div style="font-size: 9px; color: var(--muted);">°C</div>
+            <div style="text-align: right;">
+              <div style="font-size: 8.5px; color: var(--accent); letter-spacing: 1px;">KONTROL</div>
+              <div class="tx-value" id="t6ctrl" style="color: var(--accent); font-size: 22px;">—</div>
+            </div>
+          </div>
         </div>
       </div>
-
     </div>
 
     <div class="charts-panel" style="display:flex; flex-direction:column; border-right: none;">
-      <div class="section-title" style="padding-bottom:0;border-bottom:none"><i class="ti ti-chart-line"></i> Grafik Realtime</div>
+      <div class="section-title" style="padding-bottom:0;border-bottom:none"><i class="ti ti-chart-line"></i> Grafik Komparasi Realtime (Aktif vs Kontrol)</div>
       <div class="chart-header">
         <div class="chart-tabs">
           <button class="tab-btn active" onclick="switchTab(0)" style="color:#ffb24f;border-bottom-color:#ffb24f">Suhu Panel</button>
-          <button class="tab-btn" onclick="switchTab(1)">Lingkungan</button>
-          <button class="tab-btn" onclick="switchTab(2)">Tegangan (V)</button>
-          <button class="tab-btn" onclick="switchTab(3)">Arus (A)</button>
-          <button class="tab-btn" onclick="switchTab(4)">Daya (W)</button>
-          <button class="tab-btn" onclick="switchTab(5)">Aktuator PID</button>
+          <button class="tab-btn" onclick="switchTab(1)">Tegangan (V)</button>
+          <button class="tab-btn" onclick="switchTab(2)">Arus (A)</button>
+          <button class="tab-btn" onclick="switchTab(3)">Daya (W)</button>
+          <button class="tab-btn" onclick="switchTab(4)">Aktuator PID</button>
+          <button class="tab-btn" onclick="switchTab(5)">Lingkungan</button>
         </div>
         <div class="time-range-bar">
-          <span>Rentang Pengujian:</span>
+          <span>Rentang Waktu:</span>
           <button class="range-btn active" onclick="setRange(900)">15 Menit</button>
           <button class="range-btn" onclick="setRange(3600)">1 Jam</button>
           <button class="range-btn" onclick="setRange(14400)">4 Jam</button>
           <button class="range-btn" onclick="setRange(28800)">8 Jam</button>
         </div>
       </div>
-      <div class="chart-area" style="flex:1; display:flex; flex-direction:column; min-height:0; min-width:0; overflow:hidden;">
+      <div class="chart-area" style="flex:1; display:flex; flex-direction:column; min-height:0; overflow:hidden;">
         <div class="legend-row" id="legendRow"></div>
-        <div class="chart-wrap" style="flex:1; position:relative; min-height:0; min-width:0; overflow:hidden;">
+        <div class="chart-wrap" style="flex:1; position:relative; min-height:0;">
           <canvas id="rtChart"></canvas>
         </div>
       </div>
     </div>
+  </div> 
 
-  </div> <div class="bottom-row">
-    
-    <div style="display: grid; grid-template-columns: 1fr 1fr; border-right: 1px solid var(--border);">
-      
-      <div class="pumps-panel" style="border-right: 1px solid var(--border); border-top: none; display: flex; flex-direction: column;">
-        <div class="section-title"><i class="ti ti-engine"></i> Aktuator & Kendali Pompa</div>
-        <div class="pump-list" style="flex: 1; overflow-y: auto; padding: 10px;">
-          
-          <div class="pump-card" id="pcard-pm1" style="margin-bottom: 12px; min-height: 80px;">
-            <div class="pump-icon-wrap" id="picon-pm1">
-              <div class="spin-ring"></div>
-              <i class="ti ti-droplet-half-2"></i>
-            </div>
-            <div class="pump-info">
-              <div class="pump-name">PM-01 · Pompa Pendingin</div>
-              <div class="pump-spec">Diaphragm Pump 12V DC</div>
-              <div class="pump-stats">
-                <span class="pump-rpm"><span id="pm1pwm">—</span> <span style="font-size:7.5px;color:var(--muted)">PWM</span></span>
-                <span style="font-size:8.5px;color:var(--muted)">Duty Cycle:</span>
-                <span style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--accent2)" id="pm1load">—</span><span style="font-size:7.5px;color:var(--muted)">%</span>
-              </div>
-              <div class="pump-bar"><div class="pump-bar-fill" id="pm1bar" style="width:0%"></div></div>
-            </div>
+  <div class="bottom-row">
+    <div class="pumps-panel" style="border-right: 1px solid var(--border); display: flex; flex-direction: column;">
+      <div class="section-title"><i class="ti ti-engine"></i> Aktuator & Kendali Pompa (Panel Aktif)</div>
+      <div class="pump-list" style="flex: 1; padding: 10px;">
+        
+        <div class="pump-card" id="pcard-pm1" style="margin-bottom: 12px; min-height: 80px;">
+          <div class="pump-icon-wrap" id="picon-pm1">
+            <div class="spin-ring"></div><i class="ti ti-droplet-half-2"></i>
           </div>
-          
-          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 4px; padding: 12px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
-              <span style="font-size:11px; color:var(--text); text-transform:uppercase; font-weight: 600;"><i class="ti ti-settings"></i> Mode Operasi</span>
-              <select id="ctrlMode" onchange="toggleControlMode()" style="background:var(--panel); border:1px solid var(--border); color:var(--accent); padding:4px 8px; border-radius:4px; font-size:11px; outline:none; font-family:'Exo 2', sans-serif; cursor:pointer;">
-                <option value="AUTO">Otomatis (PID)</option>
-                <option value="MANUAL">Manual (Override)</option>
-              </select>
+          <div class="pump-info">
+            <div class="pump-name">PM-01 · Sinleader 12V 4A</div>
+            <div class="pump-stats">
+              <span class="pump-rpm"><span id="pm1pwm">—</span> <span style="font-size:7.5px;color:var(--muted)">PWM</span></span>
+              <span style="font-size:8.5px;color:var(--muted)">Duty Cycle:</span>
+              <span style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--accent2)" id="pm1load">—</span><span style="font-size:7.5px;color:var(--muted)">%</span>
             </div>
-            
-            <div id="manualControls" style="opacity: 0.4; transition: opacity 0.3s;">
-              <div style="display:flex; justify-content:space-between; margin-bottom: 8px;">
-                <span style="font-size:10px; color:var(--muted); text-transform:uppercase;">Target PWM (<span id="pwmValDisp" class="mono" style="color:var(--text);">0</span>)</span>
-                <span id="pwmPctDisp" class="mono" style="font-size:14px; color:var(--accent2); font-weight:bold;">0%</span>
-              </div>
-              <input type="range" id="pwmSlider" min="0" max="255" value="0" disabled style="width:100%; cursor:pointer;" oninput="updateSliderDisp(this.value)" onchange="sendManualPWM(this.value)">
-              <div style="font-size:8.5px; color:var(--muted); margin-top:6px; text-align:right;">*Geser untuk memodulasi kecepatan motor DC</div>
-            </div>
+            <div class="pump-bar"><div class="pump-bar-fill" id="pm1bar" style="width:0%"></div></div>
           </div>
-
         </div>
-      </div>
-
-      <div class="valves-panel" style="border-top: none; display:flex; flex-direction:column; background: transparent;">
-        <div class="section-title"><i class="ti ti-bolt"></i> Kelistrikan & Lingkungan</div>
-        <div class="valve-grid" style="grid-template-columns: repeat(2, 1fr); gap: 6px; padding: 10px; border:none; margin:0; background: transparent; overflow-y:auto;">
-          
-          <div class="valve-cell" style="padding:8px; border:1px solid var(--border); border-radius: 4px;">
-            <div class="valve-id" style="font-size:10px; color:var(--accent); text-align: left; width: 100%;">TA-01</div>
-            <div class="mono" id="ta1val" style="font-size:18px; font-weight:bold; color:#00d4ff; margin: 4px 0;">—</div>
-            <div style="font-size:8px; color:var(--muted);">Suhu Ambien (°C)</div>
+        
+        <div style="background: var(--card); border: 1px solid var(--border); border-radius: 4px; padding: 12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+            <span style="font-size:11px; color:var(--text); text-transform:uppercase; font-weight: 600;"><i class="ti ti-settings"></i> Mode Operasi</span>
+            <select id="ctrlMode" onchange="toggleControlMode()" style="background:var(--panel); border:1px solid var(--border); color:var(--accent); padding:4px 8px; border-radius:4px; outline:none; font-family:'Exo 2', sans-serif;">
+              <option value="AUTO">Otomatis (PID)</option>
+              <option value="MANUAL">Manual (Override)</option>
+            </select>
           </div>
-          <div class="valve-cell" style="padding:8px; border:1px solid var(--border); border-radius: 4px;">
-            <div class="valve-id" style="font-size:10px; color:var(--accent); text-align: left; width: 100%;">V-01</div>
-            <div class="mono" id="v1val" style="font-size:18px; font-weight:bold; color:#ffd700; margin: 4px 0;">—</div>
-            <div style="font-size:8px; color:var(--muted);">Tegangan Panel (V)</div>
+          <div id="manualControls" style="opacity: 0.4; transition: opacity 0.3s;">
+            <div style="display:flex; justify-content:space-between; margin-bottom: 8px;">
+              <span style="font-size:10px; color:var(--muted); text-transform:uppercase;">Target PWM (<span id="pwmValDisp" class="mono" style="color:var(--text);">0</span>)</span>
+              <span id="pwmPctDisp" class="mono" style="font-size:14px; color:var(--accent2); font-weight:bold;">0%</span>
+            </div>
+            <input type="range" id="pwmSlider" min="0" max="255" value="0" disabled style="width:100%; cursor:pointer;" oninput="updateSliderDisp(this.value)" onchange="sendManualPWM(this.value)">
           </div>
-          <div class="valve-cell" style="padding:8px; border:1px solid var(--border); border-radius: 4px;">
-            <div class="valve-id" style="font-size:10px; color:var(--accent); text-align: left; width: 100%;">I-01</div>
-            <div class="mono" id="i1val" style="font-size:18px; font-weight:bold; color:#ff6b35; margin: 4px 0;">—</div>
-            <div style="font-size:8px; color:var(--muted);">Arus Panel (A)</div>
-          </div>
-          <div class="valve-cell" style="padding:8px; border:1px solid var(--border); border-radius: 4px;">
-            <div class="valve-id" style="font-size:10px; color:var(--warn); text-align: left; width: 100%;">P-01</div>
-            <div class="mono" id="p1val" style="font-size:18px; font-weight:bold; color:#ff4444; margin: 4px 0;">—</div>
-            <div style="font-size:8px; color:var(--muted);">Daya Bersih (W)</div>
-          </div>
-          <div class="valve-cell" style="padding:8px; border:1px solid rgba(0,212,255,0.4); border-radius: 4px; background: rgba(0,212,255,0.05);">
-            <div class="valve-id" style="font-size:10px; color:#00d4ff; text-align: left; width: 100%;">T-AVG</div>
-            <div class="mono" id="tavg-val" style="font-size:18px; font-weight:bold; color:#00d4ff; margin: 4px 0;">—</div>
-            <div style="font-size:8px; color:var(--muted);">Rata-rata Suhu (°C)</div>
-          </div>
-          <div class="valve-cell" style="padding:8px; border:1px solid var(--border); border-radius: 4px;">
-            <div class="valve-id" style="font-size:10px; color:#00ff9d; text-align: left; width: 100%;">RH-01</div>
-            <div class="mono" id="rh1val" style="font-size:18px; font-weight:bold; color:#00ff9d; margin: 4px 0;">—</div>
-            <div style="font-size:8px; color:var(--muted);">Kelembapan Udara (%)</div>
-          </div>
-          
         </div>
       </div>
     </div>
 
-    <div class="energy-panel" style="display: flex; flex-direction: column; padding: 15px; background: var(--panel); min-height:0; min-width:0; overflow:hidden;">
-      <div class="section-title" style="border-bottom: 1px solid var(--border); padding: 0 0 10px 0; display: flex; justify-content: space-between; align-items: center;">
-        <span><i class="ti ti-bolt"></i> Grafik Energi Terakumulasi Harian</span>
-        <div class="mono" style="font-size: 18px; font-weight: bold; color: #ffd700; background: var(--card); padding: 2px 10px; border-radius: 4px; border: 1px solid var(--border);">
-          <span id="energy-val">0.000</span> <span style="font-size: 10px; color: var(--muted);">Wh</span>
+    <div class="valves-panel" style="display:flex; flex-direction:column; background: transparent; flex: 1; min-height: 0;">
+      <div class="section-title"><i class="ti ti-bolt"></i> Komparasi Parameter Analitik</div>
+      <div style="display: flex; flex: 1; padding: 12px; gap: 12px; overflow: hidden;">
+        
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+          <div style="text-align:center; font-size:10px; font-weight:bold; color:var(--accent2); letter-spacing:1px;">PANEL AKTIF (PENDINGIN)</div>
+          <div class="valve-cell" style="flex: 1.2; border:1px solid rgba(0,255,157,0.3); border-radius: 4px; background: rgba(0,255,157,0.05); display: flex; flex-direction: column; justify-content: center; align-items: center;">
+            <div class="valve-id" style="font-size:11px; color:#00ff9d; margin-bottom: 6px;">T-AVG AKTIF</div>
+            <div class="mono" id="tavg-aktif" style="font-size:26px; font-weight:bold; color:#00ff9d;">—</div>
+            <div style="font-size:10px; color:var(--muted); margin-top: 6px;">Rata-rata Suhu (°C)</div>
+          </div>
+          <div style="display: flex; flex: 1; gap: 8px;">
+            <div class="valve-cell" style="flex: 1; border:1px solid var(--border); border-radius: 4px; display: flex; flex-direction: column; justify-content: center;">
+              <div class="valve-id" style="font-size:9px; color:var(--accent);">V-AKTIF</div>
+              <div class="mono" id="v-aktif" style="font-size:14px; font-weight:bold; color:#ffd700; margin: 4px 0;">—</div>
+              <div style="font-size:8px; color:var(--muted);">Volt</div>
+            </div>
+            <div class="valve-cell" style="flex: 1; border:1px solid var(--border); border-radius: 4px; display: flex; flex-direction: column; justify-content: center;">
+              <div class="valve-id" style="font-size:9px; color:#ff6b35;">I-AKTIF</div>
+              <div class="mono" id="i-aktif" style="font-size:14px; font-weight:bold; color:#ff6b35; margin: 4px 0;">—</div>
+              <div style="font-size:8px; color:var(--muted);">Ampere</div>
+            </div>
+            <div class="valve-cell" style="flex: 1; border:1px solid var(--border); border-radius: 4px; display: flex; flex-direction: column; justify-content: center;">
+              <div class="valve-id" style="font-size:9px; color:var(--warn);">P-AKTIF</div>
+              <div class="mono" id="p-aktif" style="font-size:14px; font-weight:bold; color:#ff4444; margin: 4px 0;">—</div>
+              <div style="font-size:8px; color:var(--muted);">Watt</div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div style="position: relative; flex: 1; width: 100%; margin-top: 15px; min-height:0; min-width:0; overflow:hidden;">
-        <canvas id="energyChart"></canvas>
-      </div>
-    </div>
 
-  </div>
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+          <div style="text-align:center; font-size:10px; font-weight:bold; color:var(--accent); letter-spacing:1px;">PANEL KONTROL (BASELINE)</div>
+          <div class="valve-cell" style="flex: 1.2; border:1px solid rgba(255,178,79,0.3); border-radius: 4px; background: rgba(255,178,79,0.05); display: flex; flex-direction: column; justify-content: center; align-items: center;">
+            <div class="valve-id" style="font-size:11px; color:#ffb24f; margin-bottom: 6px;">T-AVG KONTROL</div>
+            <div class="mono" id="tavg-kontrol" style="font-size:26px; font-weight:bold; color:#ffb24f;">—</div>
+            <div style="font-size:10px; color:var(--muted); margin-top: 6px;">Rata-rata Suhu (°C)</div>
+          </div>
+          <div style="display: flex; flex: 1; gap: 8px;">
+            <div class="valve-cell" style="flex: 1; border:1px solid var(--border); border-radius: 4px; display: flex; flex-direction: column; justify-content: center;">
+              <div class="valve-id" style="font-size:9px; color:var(--accent);">V-KONTROL</div>
+              <div class="mono" id="v-kontrol" style="font-size:14px; font-weight:bold; color:#ffd700; margin: 4px 0;">—</div>
+              <div style="font-size:8px; color:var(--muted);">Volt</div>
+            </div>
+            <div class="valve-cell" style="flex: 1; border:1px solid var(--border); border-radius: 4px; display: flex; flex-direction: column; justify-content: center;">
+              <div class="valve-id" style="font-size:9px; color:#ff6b35;">I-KONTROL</div>
+              <div class="mono" id="i-kontrol" style="font-size:14px; font-weight:bold; color:#ff6b35; margin: 4px 0;">—</div>
+              <div style="font-size:8px; color:var(--muted);">Ampere</div>
+            </div>
+            <div class="valve-cell" style="flex: 1; border:1px solid var(--border); border-radius: 4px; display: flex; flex-direction: column; justify-content: center;">
+              <div class="valve-id" style="font-size:9px; color:var(--warn);">P-KONTROL</div>
+              <div class="mono" id="p-kontrol" style="font-size:14px; font-weight:bold; color:#ff4444; margin: 4px 0;">—</div>
+              <div style="font-size:8px; color:var(--muted);">Watt</div>
+            </div>
+          </div>
+        </div>
 
-  
-  </div><div class="alarm-bar">
-    <div class="alarm-label"><i class="ti ti-activity"></i> Status Sistem</div>
-    <div class="ticker-wrap">
-      <div class="ticker-track" id="tickerTrack"></div>
-    </div>
-  </div>
-</div>
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+          <div style="text-align:center; font-size:10px; font-weight:bold; color:var(--text); letter-spacing:1px;">LINGKUNGAN</div>
+          <div class="valve-cell" style="flex: 1.2; border:1px solid rgba(0,212,255,0.3); border-radius: 4px; background: rgba(0,212,255,0.05); display: flex; flex-direction: column; justify-content: center; align-items: center;">
+            <div class="valve-id" style="font-size:11px; color:#00d4ff; margin-bottom: 6px;">ΔT EFISIENSI</div>
+            <div class="mono" id="deltat-val" style="font-size:26px; font-weight:bold; color:#00d4ff;">—</div>
+            <div style="font-size:10px; color:var(--muted); margin-top: 6px;">Selisih Suhu Aktif-Kontrol</div>
+          </div>
+          <div style="display: flex; flex: 1; gap: 8px;">
+            <div class="valve-cell" style="flex: 1; border:1px solid var(--border); border-radius: 4px; display: flex; flex-direction: column; justify-content: center;">
+              <div class="valve-id" style="font-size:9px; color:var(--text);">TA-01</div>
+              <div class="mono" id="ta1val" style="font-size:16px; font-weight:bold; color:#e2e8f0; margin: 4px 0;">—</div>
+              <div style="font-size:8px; color:var(--muted);">Suhu (°C)</div>
+            </div>
+            <div class="valve-cell" style="flex: 1; border:1px solid var(--border); border-radius: 4px; display: flex; flex-direction: column; justify-content: center;">
+              <div class="valve-id" style="font-size:9px; color:#00ff9d;">RH-01</div>
+              <div class="mono" id="rh1val" style="font-size:16px; font-weight:bold; color:#00ff9d; margin: 4px 0;">—</div>
+              <div style="font-size:8px; color:var(--muted);">Kelembapan (%)</div>
+            </div>
+          </div>
+        </div>
 
-<div class="modal-overlay" id="exportModal">
-  <div class="modal-box">
-    <div class="modal-title"><i class="ti ti-download"></i> Export Data Sensor</div>
-    <div class="modal-body">
-      <div class="modal-row">
-        <div class="modal-label">Sensor</div>
-        <select class="modal-select" id="expSensor">
-          <option value="ALL">Semua Parameter (Gabungan)</option>
-          <option value="T-01">T-01 · Suhu Panel 1</option>
-          <option value="T-02">T-02 · Suhu Panel 2</option>
-          <option value="T-03">T-03 · Suhu Panel 3</option>
-          <option value="T-04">T-04 · Suhu Panel 4</option>
-          <option value="T-05">T-05 · Suhu Panel 5</option>
-          <option value="T-06">T-06 · Suhu Panel 6</option>
-          <option value="TA-01">TA-01 · Suhu Ambien</option>
-          <option value="V-01">V-01 · Tegangan Panel</option>
-          <option value="I-01">I-01 · Arus Panel</option>
-          <option value="P-01">P-01 · Daya Listrik (Power)</option>
-          <option value="PM-01">PM-01 · Aktuator Modulasi PWM</option>
-        </select>
-
-        <label style="margin-top:10px;display:block;font-size:12px;color:var(--muted)">Rentang Waktu Rekaman:</label>
-        <select class="modal-select" id="expMinutes">
-          <option value="15">15 Menit Terakhir</option>
-          <option value="60">1 Jam Terakhir</option>
-          <option value="360">6 Jam Terakhir</option>
-          <option value="480">8 Jam Terakhir</option>
-          <option value="720">12 Jam Terakhir</option>
-          <option value="1440">24 Jam Terakhir</option>
-        </select>
-      </div>
-      <div class="modal-row">
-        <div class="modal-label">Format</div>
-        <select class="modal-select" id="expFormat">
-          <option value="csv">CSV</option>
-          <option value="json">JSON</option>
-        </select>
       </div>
     </div>
-    <div class="modal-actions">
-      <button class="modal-btn" onclick="closeModal('exportModal')">Batal</button>
-      <button class="modal-btn primary" onclick="exportData()"><i class="ti ti-download"></i> Download</button>
-    </div>
-  </div>
-</div>
 
-<div class="modal-overlay" id="alarmModal">
-  <div class="modal-box">
-    <div class="modal-title"><i class="ti ti-bell"></i> Pengaturan Batas Alarm</div>
-    <div class="modal-body">
-      <div style="font-size:8.5px;color:var(--muted);letter-spacing:1px;margin-bottom:4px">Batas ini akan disinkronisasi ke server dan memicu log database.</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:center">
-        <div style="font-size:8px;color:var(--muted);letter-spacing:1px">SENSOR</div>
-        <div style="font-size:8px;color:var(--muted);letter-spacing:1px">MIN</div>
-        <div style="font-size:8px;color:var(--muted);letter-spacing:1px">MAX</div>
-
-        <div class="modal-label">LT-101 (m)</div>
-        <input class="modal-input" id="alm_lt1_min" type="number" step="0.1" placeholder="0.2">
-        <input class="modal-input" id="alm_lt1_max" type="number" step="0.1" placeholder="3.8">
-
-        <div class="modal-label">PT-201 (bar)</div>
-        <input class="modal-input" id="alm_pt1_min" type="number" step="0.1" placeholder="0.5">
-        <input class="modal-input" id="alm_pt1_max" type="number" step="0.1" placeholder="4.5">
-
-        <div class="modal-label">QT-301 (ppm)</div>
-        <input class="modal-input" id="alm_qt1_min" type="number" step="1" placeholder="0">
-        <input class="modal-input" id="alm_qt1_max" type="number" step="1" placeholder="300">
-
-        <div class="modal-label">FT-401 (m³/h)</div>
-        <input class="modal-input" id="alm_ft1_min" type="number" step="1" placeholder="10">
-        <input class="modal-input" id="alm_ft1_max" type="number" step="1" placeholder="70">
-      </div>
-    </div>
-    <div class="modal-actions">
-      <button class="modal-btn" onclick="closeModal('alarmModal')">Batal</button>
-      <button class="modal-btn primary" onclick="saveAlarms()">Simpan & Sync</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="logModal">
-  <div class="modal-box" style="width:580px; max-width:95vw;">
-    <div class="modal-title"><i class="ti ti-list"></i> Riwayat Alarm Terakhir</div>
-    <div class="modal-body" style="max-height: 300px; overflow-y: auto;">
-      <table class="log-table">
-        <thead>
-          <tr>
-            <th>WAKTU</th>
-            <th>SENSOR</th>
-            <th>TIPE ALARM</th>
-            <th>NILAI TERCATAT</th>
-            <th>BATAS</th>
-          </tr>
-        </thead>
-        <tbody id="logTableBody">
-          <tr><td colspan="5" style="text-align:center; padding: 10px;">Memuat data database...</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="modal-actions">
-      <button class="modal-btn" onclick="closeModal('logModal')">Tutup</button>
-      <button class="modal-btn primary" onclick="fetchAlarmLogs()"><i class="ti ti-refresh"></i> Muat Ulang</button>
-    </div>
+  <div class="alarm-bar">
+    <div class="alarm-label"><i class="ti ti-activity"></i> Log Sistem</div>
+    <div class="ticker-wrap"><div class="ticker-track" id="tickerTrack"></div></div>
   </div>
 </div>
 
@@ -682,6 +623,9 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;displ
           <option value="tegangan_V">Tegangan Panel (Volt)</option>
           <option value="arus_A">Arus Panel (Ampere)</option>
           <option value="daya_W">Daya Listrik (Watt)</option>
+          <option value="TA-01">TA-01 · Suhu Ambien</option>
+          <option value="RH-01">RH-01 · Kelembapan Udara</option>
+          <option value="PM-01">PM-01 · Sinyal PWM Pompa</option>
           <option value="T-01">T-01 · Suhu Panel 1</option>
           <option value="T-02">T-02 · Suhu Panel 2</option>
           <option value="T-03">T-03 · Suhu Panel 3</option>
@@ -697,8 +641,6 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;displ
           <option value="15">15 Menit Terakhir</option>
           <option value="60">1 Jam Terakhir</option>
           <option value="360">6 Jam Terakhir</option>
-          <option value="480">8 Jam Terakhir</option>
-          <option value="720">12 Jam Terakhir</option>
           <option value="1440">24 Jam Terakhir</option>
           <option value="999999">Seluruh Data Tersimpan</option>
         </select>
@@ -712,16 +654,17 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;displ
         </select>
       </div>
 
-      <button class="export-btn" onclick="exportData()" style="margin-top: 10px; padding: 10px; background: var(--accent2); color: #000; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Unduh Berkas</button>
-    </div>
+      <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;">
+        <button onclick="closeModal('exportModal')" style="padding: 10px 15px; background: var(--card); color: var(--text); border: 1px solid var(--border); border-radius: 4px; font-weight: bold; cursor: pointer;">Batal / Tutup</button>
+        <button class="export-btn" onclick="exportData()" style="padding: 10px 15px; background: var(--accent2); color: #000; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;"><i class="ti ti-download"></i> Unduh Berkas</button>
+      </div>
+
   </div>
 </div>
 
+
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
-
-
 
 <script>
 /* ── UI & MODAL ── */
@@ -753,11 +696,6 @@ function toggleTheme(){
   chart.options.plugins.tooltip.borderColor = styles.getPropertyValue('--tooltip-border').trim();
   Chart.defaults.color = tickColor;
   chart.update('none');
-  energyChart.options.scales.x.grid.color = gridColor;
-  energyChart.options.scales.y.grid.color = gridColor;
-  energyChart.options.scales.x.ticks.color = tickColor;
-  energyChart.options.scales.y.ticks.color = tickColor;
-  energyChart.update('none');
 }
 
 function toggleFullscreen(){
@@ -766,121 +704,29 @@ function toggleFullscreen(){
 }
 
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
-document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open'); }));
 function openExportModal(){ document.getElementById('exportModal').classList.add('open'); }
 
-
-/* ── DATA EKSPOR ── */
-/* ── FUNGSI EKSPOR DATA FIREBASE ── */
-function exportData() {
-  const elSource = document.getElementById('expSource');
-  const elSensor = document.getElementById('expSensor');
-  const elWaktu = document.getElementById('expMinutes');
-  const elFormat = document.getElementById('expFormat');
-
-  if (!elSource || !elSensor || !elWaktu || !elFormat) {
-    alert("Elemen formulir tidak ditemukan.");
-    return;
-  }
-
-  const sumberData = elSource.value; // 'sistem_pendingin' atau 'sistem_kontrol'
-  const pilihanSensor = elSensor.value; 
-  const rentangWaktuMenit = parseInt(elWaktu.value);
-  const formatData = elFormat.value.toUpperCase();
-
-  const btn = document.querySelector('.export-btn');
-  const teksAsli = btn ? btn.textContent : 'UNDUH';
-  if (btn) btn.textContent = "MENGAMBIL DATA DARI CLOUD...";
-
-  // Menarik data dari direktori historis yang dipilih
-  const pathDatabase = sumberData + '/histori';
-  
-  firebase.database().ref(pathDatabase).once('value').then((snapshot) => {
-    const data = snapshot.val();
-    if (!data) {
-      alert("Tidak ada rekaman data pada direktori " + (sumberData === 'sistem_pendingin' ? 'Aktif' : 'Kontrol') + ".");
-      if (btn) btn.textContent = teksAsli;
-      return;
-    }
-
-    let records = Object.values(data);
-    const waktuSekarang = new Date().getTime();
-
-    // Filter berdasarkan rentang waktu
-    records = records.filter(record => {
-      if (!record.waktu) return false;
-      const stringWaktu = record.waktu.replace(/-/g, '/'); 
-      const waktuRecord = new Date(stringWaktu).getTime();
-      const selisihMenit = (waktuSekarang - waktuRecord) / (1000 * 60);
-      return selisihMenit <= rentangWaktuMenit;
-    });
-
-    if (records.length === 0) {
-      alert("Tidak ada data dalam rentang waktu " + rentangWaktuMenit + " menit terakhir.");
-      if (btn) btn.textContent = teksAsli;
-      return;
-    }
-
-    // Filter kolom parameter
-    let dataAkhir = records;
-    if (pilihanSensor !== 'ALL') {
-      dataAkhir = records.map(record => {
-        return {
-          waktu: record.waktu,
-          [pilihanSensor]: record[pilihanSensor] !== undefined ? record[pilihanSensor] : null
-        };
-      });
-    }
-
-    // Pembuatan berkas keluaran
-    let dataStr = "";
-    let rentangTeks = rentangWaktuMenit >= 60 ? (rentangWaktuMenit/60) + "Jam" : rentangWaktuMenit + "Menit";
-    if (rentangWaktuMenit === 999999) rentangTeks = "Semua";
-    
-    let namaSistem = sumberData === 'sistem_pendingin' ? 'Aktif' : 'Kontrol';
-    let namaFile = `Dataset_${namaSistem}_${pilihanSensor}_${rentangTeks}`;
-
-    if (formatData === 'JSON') {
-      dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataAkhir, null, 2));
-      namaFile += ".json";
-    } else {
-      const headers = Object.keys(dataAkhir[0]).join(",");
-      const rows = dataAkhir.map(obj => Object.values(obj).join(",")).join("\n");
-      dataStr = "data:text/csv;charset=utf-8," + encodeURIComponent(headers + "\n" + rows);
-      namaFile += ".csv";
-    }
-
-    const anchor = document.createElement('a');
-    anchor.setAttribute("href", dataStr);
-    anchor.setAttribute("download", namaFile);
-    document.body.appendChild(anchor); 
-    anchor.click();
-    anchor.remove();
-
-    if (btn) btn.textContent = teksAsli;
-    
-  }).catch((error) => {
-    alert("Galat sinkronisasi Firebase: " + error.message);
-    if (btn) btn.textContent = teksAsli;
-  });
-}
-
-/* ── KONFIGURASI GRAFIK ── */
+/* ── KONFIGURASI GRAFIK KOMPARASI ── */
 const tsLabels = [];
+// Dataset diubah menjadi susunan komparatif (Aktif vs Kontrol) dalam satu kanvas
 const allDS = [
-  [ {label:'T-01 (°C)', data:[], borderColor:'#ff6a52', borderWidth:1.5, pointRadius:0, tension:0.4, fill:false}, {label:'T-02 (°C)', data:[], borderColor:'#ff8c00', borderWidth:1.5, pointRadius:0, tension:0.4, fill:false}, {label:'T-03 (°C)', data:[], borderColor:'#ffd700', borderWidth:1.5, pointRadius:0, tension:0.4, fill:false}, {label:'T-04 (°C)', data:[], borderColor:'#a3ff00', borderWidth:1.5, pointRadius:0, tension:0.4, fill:false}, {label:'T-05 (°C)', data:[], borderColor:'#00ff9d', borderWidth:1.5, pointRadius:0, tension:0.4, fill:false}, {label:'T-06 (°C)', data:[], borderColor:'#00d4ff', borderWidth:1.5, pointRadius:0, tension:0.4, fill:false} ],
-  [ {label:'Suhu Ambien (°C)', data:[], borderColor:'#00d4ff', borderWidth:1.5, pointRadius:0, tension:0.4, fill:true, backgroundColor:'rgba(0,212,255,0.06)'}, {label:'Kelembapan (%)', data:[], borderColor:'#00ff9d', borderWidth:1.5, pointRadius:0, tension:0.4, fill:true, backgroundColor:'rgba(0,255,157,0.06)'} ],
-  [ {label:'Tegangan (V)', data:[], borderColor:'#ffd700', borderWidth:2, pointRadius:0, tension:0.4, fill:true, backgroundColor:'rgba(255,215,0,0.06)'} ],
-  [ {label:'Arus (A)', data:[], borderColor:'#ff6b35', borderWidth:2, pointRadius:0, tension:0.4, fill:true, backgroundColor:'rgba(255,107,53,0.06)'} ],
-  [ {label:'Daya (W)', data:[], borderColor:'#ff4444', borderWidth:2, pointRadius:0, tension:0.4, fill:true, backgroundColor:'rgba(255,68,68,0.06)'} ],
-  [ {label:'Sinyal PWM (0-255)', data:[], borderColor:'#4488ff', borderWidth:2, pointRadius:0, tension:0.4, fill:true, backgroundColor:'rgba(68,136,255,0.1)'} ]
+  [ {label:'T-AVG Aktif (°C)', data:[], borderColor:'#00ff9d', borderWidth:2, pointRadius:0, tension:0.4, fill:false},
+    {label:'T-AVG Kontrol (°C)', data:[], borderColor:'#ffb24f', borderWidth:2, pointRadius:0, tension:0.4, borderDash:[4,4], fill:false} ],
+  [ {label:'Tegangan Aktif (V)', data:[], borderColor:'#ffd700', borderWidth:2, pointRadius:0, tension:0.4, fill:false},
+    {label:'Tegangan Kontrol (V)', data:[], borderColor:'#ffb24f', borderWidth:2, pointRadius:0, tension:0.4, borderDash:[4,4], fill:false} ],
+  [ {label:'Arus Aktif (A)', data:[], borderColor:'#ff6b35', borderWidth:2, pointRadius:0, tension:0.4, fill:false},
+    {label:'Arus Kontrol (A)', data:[], borderColor:'#ffb24f', borderWidth:2, pointRadius:0, tension:0.4, borderDash:[4,4], fill:false} ],
+  [ {label:'Daya Aktif (W)', data:[], borderColor:'#ff4444', borderWidth:2, pointRadius:0, tension:0.4, fill:true, backgroundColor:'rgba(255,68,68,0.1)'},
+    {label:'Daya Kontrol (W)', data:[], borderColor:'#ffb24f', borderWidth:2, pointRadius:0, tension:0.4, borderDash:[4,4], fill:false} ],
+  [ {label:'Sinyal PWM Aktif', data:[], borderColor:'#4488ff', borderWidth:2, pointRadius:0, tension:0.4, fill:true, backgroundColor:'rgba(68,136,255,0.1)'} ],
+  // Tambahan Dataset Tab Lingkungan
+  [ {label:'Suhu Ambien (°C)', data:[], borderColor:'#00d4ff', borderWidth:2, pointRadius:0, tension:0.4, fill:true, backgroundColor:'rgba(0,212,255,0.06)'},
+    {label:'Kelembapan (%)', data:[], borderColor:'#00ff9d', borderWidth:2, pointRadius:0, tension:0.4, fill:true, backgroundColor:'rgba(0,255,157,0.06)'} ]
 ];
-const tabColors = ['#ffb24f','#00ff9d','#ffd700','#ff6b35','#ff4444','#4488ff'];
+const tabColors = ['#ffb24f','#ffd700','#ff6b35','#ff4444','#4488ff','#00d4ff'];
 
 let activeTab = 0;
 let CURRENT_RANGE_PTS = 900;
-window.totalWattSeconds = 0;
-window.globalWattHour = 0;
 
 Chart.defaults.color = 'var(--muted)';
 Chart.defaults.font.family = "'Share Tech Mono',monospace";
@@ -891,15 +737,9 @@ const chart = new Chart(ctx, {
   type: 'line', data: { labels: tsLabels, datasets: allDS[0] },
   options: {
     responsive: true, maintainAspectRatio: false, animation: { duration: 0 },
-    plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(6,13,26,.96)', borderColor: '#1a3a5c', borderWidth: 1, titleColor: '#c8e0f4', bodyColor: '#7aabdc', padding: 10, titleFont: { size: 9 }, bodyFont: { size: 8 }, callbacks: { label: c => ` ${c.dataset.label}: ${c.formattedValue}` } } },
-    scales: { x: { grid: { color: 'rgba(26,58,92,.35)', lineWidth: .5 }, ticks: { color: '#4a6fa5', maxTicksLimit: 8, maxRotation: 0 } }, y: { grid: { color: 'rgba(26,58,92,.35)', lineWidth: .5 }, ticks: { color: '#4a6fa5' }, position: 'right' } }
+    plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false, backgroundColor: 'rgba(6,13,26,.96)', borderColor: '#1a3a5c', borderWidth: 1, titleColor: '#c8e0f4', bodyColor: '#7aabdc', padding: 10 } },
+    scales: { x: { grid: { color: 'rgba(26,58,92,.35)' }, ticks: { maxTicksLimit: 8 } }, y: { grid: { color: 'rgba(26,58,92,.35)' }, position: 'right' } }
   }
-});
-
-const ctxEnergy = document.getElementById('energyChart').getContext('2d');
-const energyChart = new Chart(ctxEnergy, {
-  type: 'line', data: { labels: [], datasets: [{ label: 'Energi (Wh)', data: [], borderColor: '#ffd700', backgroundColor: 'rgba(255,215,0,0.1)', fill: true, tension: 0.4, borderWidth: 2, pointRadius: 0 }] },
-  options: { responsive: true, maintainAspectRatio: false, animation: { duration: 0 }, plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(26,58,92,.35)', lineWidth: .5 }, ticks: { color: '#4a6fa5', maxTicksLimit: 8, maxRotation: 0 } }, y: { grid: { color: 'rgba(26,58,92,.35)', lineWidth: .5 }, ticks: { color: '#4a6fa5' }, position: 'right' } } }
 });
 
 function updateChartView(){
@@ -909,47 +749,12 @@ function updateChartView(){
   chart.update('none');
 }
 
-function pushToChart(readings){
-  const sample = readings.find(r => r.timestamp); if(!sample) return;
-  const ts = new Date(sample.timestamp).toTimeString().slice(0,8);
-  tsLabels.push(ts);
-  
-  if(tsLabels.length > 21600){
-    tsLabels.shift();
-    allDS.forEach(ds => ds.forEach(d => { if(d.data.length) d.data.shift() }));
-    if(energyChart.data.labels.length > 21600){ energyChart.data.labels.shift(); energyChart.data.datasets[0].data.shift(); }
-  }
-  
-  const byId = {}; readings.forEach(r => { byId[r.device_id] = parseFloat(r.value) });
-  const ctrlModeEl = document.getElementById('ctrlMode');
-    if (ctrlModeEl && ctrlModeEl.value === 'MANUAL') {
-    const sliderVal = document.getElementById('pwmSlider').value;
-    byId['PM-01'] = parseFloat(sliderVal);
-  }
-
-  allDS[0][0].data.push(byId['T-01'] ?? null); allDS[0][1].data.push(byId['T-02'] ?? null); allDS[0][2].data.push(byId['T-03'] ?? null); allDS[0][3].data.push(byId['T-04'] ?? null); allDS[0][4].data.push(byId['T-05'] ?? null); allDS[0][5].data.push(byId['T-06'] ?? null);
-  allDS[1][0].data.push(byId['TA-01'] ?? null); allDS[1][1].data.push(byId['RH-01'] ?? null);
-  allDS[2][0].data.push(byId['V-01'] ?? null);
-  allDS[3][0].data.push(byId['I-01'] ?? null);
-  allDS[4][0].data.push(byId['P-01'] ?? null);
-  allDS[5][0].data.push(byId['PM-01'] ?? null);
-  
-  energyChart.data.labels.push(ts);
-  energyChart.data.datasets[0].data.push(window.globalWattHour);
-  energyChart.update('none');
-
-  updateChartView(); 
-}
-// INTERSEPSI MANUAL: Mengganti data peladen dengan nilai slider saat mode manual
-
-
-
 function buildLegend(){
   const row = document.getElementById('legendRow'); if(!row) return;
   row.innerHTML = '';
   allDS[activeTab].forEach(ds => {
     const s = document.createElement('span'); s.className = 'legend-item';
-    s.innerHTML = `<span class="legend-swatch" style="background:${ds.borderColor}"></span>${ds.label}`;
+    s.innerHTML = `<span class="legend-swatch" style="background:${ds.borderColor}; ${ds.borderDash ? 'border-top: 2px dashed #000;' : ''}"></span>${ds.label}`;
     row.appendChild(s);
   });
 }
@@ -979,246 +784,218 @@ function toggleControlMode() {
   const slider = document.getElementById('pwmSlider');
   
   if (mode === 'MANUAL') {
-    // Nyalakan visual dan fungsionalitas slider
     controls.style.opacity = '1';
     slider.disabled = false;
   } else {
-    // Matikan fungsionalitas slider agar aman dari klik tidak sengaja
     controls.style.opacity = '0.4';
     slider.disabled = true;
-    console.log("[SISTEM] Kendali dikembalikan ke algoritma PID otomatis.");
+  }
+  if (typeof firebase !== 'undefined') {
+    firebase.database().ref('sistem_pendingin/kontrol_aktuator').update({ 'MODE': mode });
   }
 }
 
 function updateSliderDisp(val) {
-  // Memperbarui angka secara waktu-nyata saat slider digeser
   document.getElementById('pwmValDisp').textContent = val;
   document.getElementById('pwmPctDisp').textContent = Math.round((val / 255) * 100) + '%';
 }
 
 function sendManualPWM(val) {
-  // Perbarui indikator antarmuka secara langsung
-  applyPumpStatus('PM-01', val);
-  console.log("[SISTEM] Transmisi PWM Manual ke ESP32 disiapkan:", val);
-  // Logika pengiriman (Firebase.setFloat) akan ditambahkan di sini saat integrasi perangkat keras
-}
-
-/* ── LOGIKA PEMROSESAN DATA ── */
-const SENSOR_MAP = {
-  'T-01': {val:'t1val', bar:'t1bar', trend:'t1trend', card:'txcard-t1', max:100, dec:1}, 'T-02': {val:'t2val', bar:'t2bar', trend:'t2trend', card:'txcard-t2', max:100, dec:1}, 'T-03': {val:'t3val', bar:'t3bar', trend:'t3trend', card:'txcard-t3', max:100, dec:1}, 'T-04': {val:'t4val', bar:'t4bar', trend:'t4trend', card:'txcard-t4', max:100, dec:1}, 'T-05': {val:'t5val', bar:'t5bar', trend:'t5trend', card:'txcard-t5', max:100, dec:1}, 'T-06': {val:'t6val', bar:'t6bar', trend:'t6trend', card:'txcard-t6', max:100, dec:1},
-  'TA-01': {val:'ta1val', bar:null, trend:null, card:null, max:100, dec:1}, 'RH-01': {val:'rh1val', bar:null, trend:null, card:null, max:100, dec:1},
-  'V-01': {val:'v1val', bar:null, trend:null, card:null, max:25, dec:2}, 'I-01': {val:'i1val', bar:null, trend:null, card:null, max:5, dec:2}, 'P-01': {val:'p1val', bar:null, trend:null, card:null, max:60, dec:2}
-};
-const PUMP_MAP = { 'PM-01': {rpm:'pm1pwm', load:'pm1load', bar:'pm1bar', rpmMax:255, card:'pcard-pm1', icon:'picon-pm1'} };
-const prevVals = {};
-
-function trendHTML(cur,prev){
-  const d=cur-prev; if(Math.abs(d)<0.001) return `<span class="trend-st"><i class="ti ti-minus"></i></span>`;
-  return d>0?`<span class="trend-up"><i class="ti ti-trending-up"></i></span>`:`<span class="trend-dn"><i class="ti ti-trending-down"></i></span>`;
-}
-
-function applySensorReading(id,value){
-  const cfg=SENSOR_MAP[id]; if(!cfg) return;
-  const n=parseFloat(value); if(isNaN(n)) return;
-  const disp=cfg.dec===0?Math.round(n):n.toFixed(cfg.dec);
-  const valEl=document.getElementById(cfg.val);
-  const barEl=document.getElementById(cfg.bar);
-  const trendEl=document.getElementById(cfg.trend);
-  if(valEl) valEl.textContent=disp;
-  if(barEl) barEl.style.width=Math.min(100,(n/cfg.max*100)).toFixed(1)+'%';
-  if(trendEl&&prevVals[id]!==undefined) trendEl.innerHTML=trendHTML(n,prevVals[id]);
-  prevVals[id]=n;
-}
-
-function applyPumpStatus(id,value){
-  const cfg=PUMP_MAP[id]; if(!cfg) return;
-  const n=parseFloat(value); const isRun=n>0;
-  const pct=Math.min(100,(n/cfg.rpmMax*100)).toFixed(0);
-  const cardEl=document.getElementById(cfg.card);
-  const iconEl=document.getElementById(cfg.icon);
-  const badge=cardEl?cardEl.querySelector('.pump-status-badge'):null;
-  if(document.getElementById(cfg.rpm)) document.getElementById(cfg.rpm).textContent=Math.round(n);
-  if(cfg.load&&document.getElementById(cfg.load)) document.getElementById(cfg.load).textContent=pct;
-  if(document.getElementById(cfg.bar)) document.getElementById(cfg.bar).style.width=pct+'%';
-  if(cardEl) cardEl.classList.toggle('running',isRun);
-  if(iconEl) iconEl.classList.toggle('running',isRun);
-  if(badge){ badge.className='pump-status-badge '+(isRun?'badge-run':'badge-stop'); badge.textContent=isRun?'Running':'Stop'; }
-}
-
-function processPayload(payload){
-  const readings=[];
-  if(Array.isArray(payload.sensors)){
-    payload.sensors.forEach(s=>{ if(s.value!==null&&s.value!==undefined) readings.push({device_id:s.id,value:s.value,timestamp:s.recorded_at}); });
-  }
-  if(Array.isArray(payload.devices)){
-    payload.devices.forEach(d=>{
-      const extra=d.extra||(d.extra_json?JSON.parse(d.extra_json):null);
-      if(d.type==='pump'){ const pwm = extra ? (extra.pwm || 0) : (d.status === 'running' ? 255 : 0); readings.push({device_id:d.id,value:pwm,timestamp:d.updated_at}); }
+  if (typeof firebase !== 'undefined') {
+    firebase.database().ref('sistem_pendingin/kontrol_aktuator').update({
+      'PM-01': parseInt(val), 'MODE': 'MANUAL'
     });
   }
-  if(readings.length===0) return;
-  
-  readings.forEach(r=>{
-  if(SENSOR_MAP[r.device_id]) applySensorReading(r.device_id,r.value);
-  else if(PUMP_MAP[r.device_id]) {
-    // Intersepsi: Periksa apakah mode Manual sedang aktif
-    const isManual = document.getElementById('ctrlMode') && document.getElementById('ctrlMode').value === 'MANUAL';
-
-    if (r.device_id === 'PM-01' && isManual) {
-      // Abaikan data dari server, biarkan slider yang mengontrol
-    } else {
-      applyPumpStatus(r.device_id, r.value);
-    }
-  }
-});
-
-  document.getElementById('statusText').textContent='SEMUA SISTEM AKTIF';
-  document.getElementById('updateInterval').textContent='Live — WebSocket';
-  document.getElementById('connDot').style.background='var(--accent2)';
-  document.getElementById('connDot').style.boxShadow='0 0 8px var(--accent2)';
-
-  let totalT = 0, countT = 0;
-  ['T-01', 'T-02', 'T-03', 'T-04', 'T-05', 'T-06'].forEach(id => { if (prevVals[id] !== undefined) { totalT += prevVals[id]; countT++; } });
-  
-  if (countT > 0) {
-    const avgT = (totalT / countT);
-    const tavgEl = document.getElementById('tavg-val');
-    if (tavgEl) tavgEl.textContent = avgT.toFixed(1);
-    
-    if (prevVals['TA-01'] !== undefined) {
-        let delta = avgT - prevVals['TA-01'];
-        const deltaEl = document.getElementById('deltat-val');
-        if (deltaEl) {
-            deltaEl.textContent = (delta > 0 ? "+" : "") + delta.toFixed(1);
-            deltaEl.style.color = delta <= 0 ? "#00ff9d" : "#ff6b35";
-        }
-    }
-  }
-
-  // === KALKULASI ENERGI WH (Versi Langsung dari Readings) ===
-  const p01 = readings.find(r => r.device_id === 'P-01');
-  if (p01) {
-      const pValue = parseFloat(p01.value);
-      // Asumsi: interval seeder adalah 2 detik. 2 detik / 3600 = 0.000555 jam.
-      window.totalWattSeconds += (pValue * 2); 
-      window.globalWattHour = window.totalWattSeconds / 3600;
-      
-      const energyEl = document.getElementById('energy-val');
-      if (energyEl) energyEl.textContent = window.globalWattHour.toFixed(3);
-  }
-
-  pushToChart(readings);
-  buildTicker();
 }
 
-/* ── TICKER ── */
-function buildTicker(){
-  const track=document.getElementById('tickerTrack'); if(!track) return;
-  track.innerHTML=''; const items=[];
-  let tavg = document.getElementById('tavg-val') ? document.getElementById('tavg-val').textContent : '0';
-  let deltat = document.getElementById('deltat-val') ? document.getElementById('deltat-val').textContent : '0';
-  let pwm = document.getElementById('pm1pwm') ? document.getElementById('pm1pwm').textContent : '0';
-  let power = document.getElementById('p1val') ? document.getElementById('p1val').textContent : '0';
-
-  items.push({text:`SISTEM PENDINGIN AKTIF VIPV: BEROPERASI`, cls:'t-ok'});
-  items.push({text:`SUHU RATA-RATA PANEL: ${tavg} °C`, cls:'t-info'});
-  items.push({text:`EFEKTIVITAS PENDINGINAN (ΔT): ${deltat} °C`, cls:'t-ok'});
-  items.push({text:`DAYA LISTRIK BERSIH: ${power} Watt`, cls:'t-warn'});
-  items.push({text:`OUTPUT MODULASI PID: ${pwm} PWM`, cls:'t-info'});
-
-  [...items,...items,...items].forEach(item=>{
-    const el=document.createElement('span'); el.className='ticker-item '+item.cls;
-    el.innerHTML=`<div class="ticker-dot"></div>${item.text}`; track.appendChild(el);
-  });
-}
-buildTicker();
-
-/* ── SERVER CONFIG ── */
-/* ── KONFIGURASI FIREBASE CLOUD WEB SDK ── */
+/* ── FIREBASE & PENGOLAHAN DATA DUAL-NODE ── */
 const firebaseConfig = {
   apiKey: "AIzaSyDZ9D3YcUpq_h0_XNiPVt6eWawumjdgra0",
   databaseURL: "https://vipv-active-cooling-default-rtdb.asia-southeast1.firebasedatabase.app/"
 };
 
-// Mencegah inisialisasi ganda yang memicu galat konsol
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
+if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
 const db = firebase.database();
 
-document.getElementById('statusText').textContent = 'MENGHUBUNGKAN KE CLOUD...';
-
-// Membaca pembaruan data secara langsung (Realtime Listener)
-db.ref('sistem_pendingin').on('value', (snapshot) => {
+// Mendengarkan ROOT database untuk menangkap kedua sistem sekaligus
+db.ref('/').on('value', (snapshot) => {
   const data = snapshot.val();
   if (!data) return;
 
-  const payload = { sensors: [], devices: [] };
+  const aktif = (data.sistem_pendingin && data.sistem_pendingin.sensor_terkini) ? data.sistem_pendingin.sensor_terkini : {};
+  const kontrol = (data.sistem_kontrol && data.sistem_kontrol.sensor_terkini) ? data.sistem_kontrol.sensor_terkini : {};
+  const aktuator = (data.sistem_pendingin && data.sistem_pendingin.kontrol_aktuator) ? data.sistem_pendingin.kontrol_aktuator : {};
 
-  // Mengekstrak data sensor suhu dan kelistrikan
-  if (data.sensor_terkini) {
-    const s = data.sensor_terkini;
-    for (const key in s) {
-      payload.sensors.push({ id: key, value: s[key], recorded_at: new Date().toISOString() });
-    }
+  // 1. Pembaruan 6 Zona Suhu Permukaan
+  const zIds = ['1','2','3','4','5','6'];
+  zIds.forEach(id => {
+    const vA = aktif[`T-0${id}`];
+    const vK = kontrol[`T-0${id}`];
+    document.getElementById(`t${id}val`).textContent = (vA !== undefined && vA !== null) ? parseFloat(vA).toFixed(1) : '—';
+    document.getElementById(`t${id}ctrl`).textContent = (vK !== undefined && vK !== null) ? parseFloat(vK).toFixed(1) : '—';
+  });
+
+  // 2. Pembaruan Rata-rata Suhu & Efisiensi Termal
+  const tAvgA = aktif['T-panel'] || 0;
+  const tAvgK = kontrol['T-panel'] || 0;
+  document.getElementById('tavg-aktif').textContent = tAvgA ? parseFloat(tAvgA).toFixed(1) : '—';
+  document.getElementById('tavg-kontrol').textContent = tAvgK ? parseFloat(tAvgK).toFixed(1) : '—';
+  
+  const deltaT = tAvgK - tAvgA;
+  const elDelta = document.getElementById('deltat-val');
+  if (elDelta) {
+    elDelta.textContent = deltaT.toFixed(1);
+    elDelta.style.color = deltaT > 0 ? '#00d4ff' : '#ffb24f';
   }
 
-  // Mengekstrak data kendali aktuator
-  if (data.kontrol_aktuator) {
-    const k = data.kontrol_aktuator;
-    payload.devices.push({
-      id: 'PM-01', type: 'pump', 
-      status: k['PM-01'] > 0 ? 'running' : 'stop',
-      extra: { pwm: k['PM-01'] },
-      updated_at: new Date().toISOString()
-    });
-    
-    const modeEl = document.getElementById('ctrlMode');
-    if (modeEl && k['MODE']) modeEl.value = k['MODE'];
+  // 3. Pembaruan Kelistrikan & DHT22
+  document.getElementById('v-aktif').textContent = aktif['V-01'] ? parseFloat(aktif['V-01']).toFixed(2) : '—';
+  document.getElementById('v-kontrol').textContent = kontrol['V-01'] ? parseFloat(kontrol['V-01']).toFixed(2) : '—';
+  document.getElementById('i-aktif').textContent = aktif['I-01'] ? parseFloat(aktif['I-01']).toFixed(2) : '—';
+  document.getElementById('i-kontrol').textContent = kontrol['I-01'] ? parseFloat(kontrol['I-01']).toFixed(2) : '—';
+  document.getElementById('p-aktif').textContent = aktif['P-01'] ? parseFloat(aktif['P-01']).toFixed(2) : '—';
+  document.getElementById('p-kontrol').textContent = kontrol['P-01'] ? parseFloat(kontrol['P-01']).toFixed(2) : '—';
+  
+  if (document.getElementById('ta1val')) document.getElementById('ta1val').textContent = aktif['TA-01'] ? parseFloat(aktif['TA-01']).toFixed(1) : '—';
+  if (document.getElementById('rh1val')) document.getElementById('rh1val').textContent = aktif['RH-01'] ? parseFloat(aktif['RH-01']).toFixed(1) : '—';
+
+  // 4. Pembaruan Status Pompa
+  const pwm = aktuator['PM-01'] || 0;
+  const modeServer = aktuator['MODE'] || 'AUTO';
+  const pwmPct = Math.round((pwm / 255) * 100);
+  
+  document.getElementById('pm1pwm').textContent = pwm;
+  document.getElementById('pm1load').textContent = pwmPct;
+  document.getElementById('pm1bar').style.width = pwmPct + '%';
+  
+  const pCard = document.getElementById('pcard-pm1');
+  const pIcon = document.getElementById('picon-pm1');
+  if(pwm > 0) {
+    pCard.classList.add('running'); pIcon.classList.add('running');
+  } else {
+    pCard.classList.remove('running'); pIcon.classList.remove('running');
   }
 
-  // Mengirim data ke mesin grafik dasbor
-  if (typeof processPayload === 'function') {
-    processPayload(payload);
-  }
+  // Intersepsi sinkronisasi Dropdown Mode
+  const modeEl = document.getElementById('ctrlMode');
+  if (modeEl && modeServer) modeEl.value = modeServer;
 
-  document.getElementById('statusText').textContent = 'SISTEM CLOUD FIREBASE AKTIF';
-  document.getElementById('updateInterval').textContent = 'Live — Cloud Sync';
+  // 5. Mendorong Data ke Grafik
+  const ts = new Date().toTimeString().slice(0,8);
+  tsLabels.push(ts);
+  if(tsLabels.length > 21600) {
+    tsLabels.shift();
+    allDS.forEach(ds => ds.forEach(d => { if(d.data.length) d.data.shift() }));
+  }
+  
+  allDS[0][0].data.push(tAvgA || null); allDS[0][1].data.push(tAvgK || null);
+  allDS[1][0].data.push(aktif['V-01'] || null); allDS[1][1].data.push(kontrol['V-01'] || null);
+  allDS[2][0].data.push(aktif['I-01'] || null); allDS[2][1].data.push(kontrol['I-01'] || null);
+  allDS[3][0].data.push(aktif['P-01'] || null); allDS[3][1].data.push(kontrol['P-01'] || null);
+  allDS[4][0].data.push(pwm || null);
+  allDS[5][0].data.push(aktif['TA-01'] || null); 
+  allDS[5][1].data.push(aktif['RH-01'] || null);
+  
+  updateChartView();
+
+  // 6. Pembaruan Status & Ticker (Log Sistem)
+  document.getElementById('statusText').textContent = 'DUAL-NODE FIREBASE AKTIF';
+  document.getElementById('updateInterval').textContent = 'Live — Sinkronisasi Serentak';
   document.getElementById('connDot').style.background = '#00ff9d';
   document.getElementById('connDot').style.boxShadow = '0 0 8px #00ff9d';
+
+  const track = document.getElementById('tickerTrack'); 
+  if(track) {
+    track.innerHTML = '';
+    const items = [
+      {text:`SISTEM PENDINGIN AKTIF: BEROPERASI`, cls:'t-ok'},
+      {text:`T-AVG AKTIF: ${tAvgA.toFixed(1)} °C | T-AVG KONTROL: ${tAvgK.toFixed(1)} °C`, cls:'t-info'},
+      {text:`EFEKTIVITAS PENDINGINAN (ΔT): ${deltaT.toFixed(1)} °C`, cls:'t-ok'},
+      {text:`DAYA AKTIF: ${aktif['P-01'] ? parseFloat(aktif['P-01']).toFixed(2) : 0} W | DAYA KONTROL: ${kontrol['P-01'] ? parseFloat(kontrol['P-01']).toFixed(2) : 0} W`, cls:'t-warn'},
+      {text:`OUTPUT MODULASI PID: ${pwm} PWM (${pwmPct}%)`, cls:'t-info'}
+    ];
+    // Menduplikasi array secara masif agar animasi CSS tidak pernah terpotong pada layar ultra-wide
+    [...items,...items,...items,...items,...items,...items,...items,...items].forEach(item=>{
+      const el = document.createElement('span'); el.className = 'ticker-item '+item.cls;
+      el.innerHTML = `<div class="ticker-dot"></div>${item.text}`; 
+      track.appendChild(el);
+    });
+  }
 });
 
-/* ── MODIFIKASI KENDALI MANUAL UNTUK FIREBASE ── */
-function sendManualPWM(val) {
-  applyPumpStatus('PM-01', val);
-  if (typeof firebase !== 'undefined') {
-    firebase.database().ref('sistem_pendingin/kontrol_aktuator').update({
-      'PM-01': parseInt(val),
-      'MODE': 'MANUAL'
-    });
-  }
-}
+/* ── FUNGSI EKSPOR DATA ── */
+function exportData() {
+  const elSource = document.getElementById('expSource');
+  const elSensor = document.getElementById('expSensor');
+  const elWaktu = document.getElementById('expMinutes');
+  const elFormat = document.getElementById('expFormat');
 
-function toggleControlMode() {
-  const mode = document.getElementById('ctrlMode').value;
-  const controls = document.getElementById('manualControls');
-  const slider = document.getElementById('pwmSlider');
-  
-  if (mode === 'MANUAL') {
-    controls.style.opacity = '1';
-    slider.disabled = false;
-  } else {
-    controls.style.opacity = '0.4';
-    slider.disabled = true;
-  }
-  
-  if (typeof firebase !== 'undefined') {
-    firebase.database().ref('sistem_pendingin/kontrol_aktuator').update({
-      'MODE': mode
-    });
-  }
-}
+  if (!elSource || !elSensor || !elWaktu || !elFormat) { alert("Elemen formulir tidak ditemukan."); return; }
 
+  const sumberData = elSource.value; 
+  const pilihanSensor = elSensor.value; 
+  const rentangWaktuMenit = parseInt(elWaktu.value);
+  const formatData = elFormat.value.toUpperCase();
+
+  const btn = document.querySelector('.export-btn');
+  const teksAsli = btn ? btn.textContent : 'UNDUH';
+  if (btn) btn.textContent = "MENGAMBIL DATA DARI CLOUD...";
+
+  const pathDatabase = sumberData + '/histori';
+  firebase.database().ref(pathDatabase).once('value').then((snapshot) => {
+    const data = snapshot.val();
+    if (!data) {
+      alert("Tidak ada rekaman data pada direktori " + (sumberData === 'sistem_pendingin' ? 'Aktif' : 'Kontrol') + ".");
+      if (btn) btn.textContent = teksAsli; return;
+    }
+
+    let records = Object.values(data);
+    const waktuSekarang = new Date().getTime();
+    records = records.filter(record => {
+      if (!record.waktu) return false;
+      const stringWaktu = record.waktu.replace(/-/g, '/'); 
+      const waktuRecord = new Date(stringWaktu).getTime();
+      return ((waktuSekarang - waktuRecord) / 60000) <= rentangWaktuMenit;
+    });
+
+    if (records.length === 0) {
+      alert("Tidak ada data dalam rentang waktu " + rentangWaktuMenit + " menit terakhir.");
+      if (btn) btn.textContent = teksAsli; return;
+    }
+
+    let dataAkhir = records;
+    if (pilihanSensor !== 'ALL') {
+      dataAkhir = records.map(record => ({ waktu: record.waktu, [pilihanSensor]: record[pilihanSensor] !== undefined ? record[pilihanSensor] : null }));
+    }
+
+    let dataStr = "";
+    let rentangTeks = rentangWaktuMenit >= 60 ? (rentangWaktuMenit/60) + "Jam" : rentangWaktuMenit + "Menit";
+    if (rentangWaktuMenit === 999999) rentangTeks = "Semua";
+    let namaSistem = sumberData === 'sistem_pendingin' ? 'Aktif' : 'Kontrol';
+    let namaFile = `Dataset_${namaSistem}_${pilihanSensor}_${rentangTeks}`;
+
+    if (formatData === 'JSON') {
+      dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataAkhir, null, 2));
+      namaFile += ".json";
+    } else {
+      const headers = Object.keys(dataAkhir[0]).join(",");
+      const rows = dataAkhir.map(obj => Object.values(obj).join(",")).join("\n");
+      dataStr = "data:text/csv;charset=utf-8," + encodeURIComponent(headers + "\n" + rows);
+      namaFile += ".csv";
+    }
+
+    const anchor = document.createElement('a');
+    anchor.setAttribute("href", dataStr);
+    anchor.setAttribute("download", namaFile);
+    document.body.appendChild(anchor); 
+    anchor.click(); anchor.remove();
+    if (btn) btn.textContent = teksAsli;
+    
+  }).catch((error) => {
+    alert("Galat sinkronisasi Firebase: " + error.message);
+    if (btn) btn.textContent = teksAsli;
+  });
+}
 </script>
 </body>
 </html>
